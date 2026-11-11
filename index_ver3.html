@@ -1,0 +1,2598 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Bilateral Sound Test</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#dfe6ee">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<style>
+/* Layout: one fixed screen, nothing to scroll. The verse sits on top, the wisp (which is the
+   Begin button) floats in the middle, the left-right line and the melody rest under it.
+   Everything else lives in a drawer that slides in from the left.
+   Colour: every tone is built from one hue (--h) and one depth (--k), so the whole app can be
+   re-tinted while lightness, and therefore legibility, stays fixed by the theme. */
+:root {
+  --h: 212;
+  --k: 0.4;
+  --font: "Jost", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+
+  --g0: hsl(var(--h), calc(var(--k) * 125%), 99%);
+  --g1: hsl(var(--h), calc(var(--k) * 72%), 92%);
+  --g2: hsl(var(--h), calc(var(--k) * 57%), 84%);
+  --ink: hsl(var(--h), calc(var(--k) * 75%), 15%);
+  --muted: hsl(var(--h), calc(var(--k) * 42%), 30%);
+  --line: hsla(var(--h), calc(var(--k) * 40%), 45%, 0.5);
+  --line-soft: hsla(var(--h), calc(var(--k) * 40%), 45%, 0.12);
+  --pill: rgba(255, 255, 255, 0.4);
+  --pill-on: rgba(255, 255, 255, 0.78);
+  --sheet-a: rgba(255, 255, 255, 0.88);
+  --sheet-b: hsla(var(--h), calc(var(--k) * 88%), 94%, 0.84);
+  --sheet-edge: rgba(255, 255, 255, 0.95);
+  --sheet-shadow: hsla(var(--h), calc(var(--k) * 95%), 24%, 0.5);
+  --scrim: hsla(var(--h), calc(var(--k) * 45%), 65%, 0.3);
+
+  --bead-a: #FFFFFF;
+  --bead-b: hsl(var(--h), calc(var(--k) * 50%), 77%);
+  --bead-c: hsl(var(--h), calc(var(--k) * 28%), 49%);
+  --bead-shadow: 0 3px 5px -2px hsla(var(--h), calc(var(--k) * 95%), 24%, 0.6);
+
+  --w-halo: rgba(255, 255, 255, 0.95);
+  --w-streak: var(--h), calc(var(--k) * 55%), 42%;
+  --w-line1: hsla(var(--h), calc(var(--k) * 68%), 33%, 0.8);
+  --w-line2: hsla(var(--h), calc(var(--k) * 50%), 47%, 0.42);
+  --w-line3: hsla(var(--h), calc(var(--k) * 50%), 47%, 0.24);
+  --w-in1: hsla(var(--h), calc(var(--k) * 52%), 48%, 0.3);
+  --w-in2: hsla(var(--h), calc(var(--k) * 52%), 48%, 0.16);
+  --w-in3: hsla(var(--h), calc(var(--k) * 52%), 48%, 0.12);
+  --w-out: rgba(255, 255, 255, 0.95);
+  --w-out-shadow: 0 0 14px 2px rgba(255, 255, 255, 0.95);
+  --w-floor: hsla(var(--h), calc(var(--k) * 88%), 24%, 0.2);
+
+  --veil: #000000;
+  --veil-ink: #7C8794;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --g0: hsl(var(--h), calc(var(--k) * 52%), 18%);
+    --g1: hsl(var(--h), calc(var(--k) * 62%), 9.5%);
+    --g2: hsl(var(--h), calc(var(--k) * 75%), 4%);
+    --ink: hsl(var(--h), calc(var(--k) * 70%), 93%);
+    --muted: hsl(var(--h), calc(var(--k) * 40%), 74%);
+    --line: rgba(255, 255, 255, 0.22);
+    --line-soft: rgba(255, 255, 255, 0.08);
+    --pill: rgba(255, 255, 255, 0.04);
+    --pill-on: rgba(255, 255, 255, 0.13);
+    --sheet-a: hsla(var(--h), calc(var(--k) * 50%), 20%, 0.9);
+    --sheet-b: hsla(var(--h), calc(var(--k) * 60%), 10%, 0.88);
+    --sheet-edge: rgba(255, 255, 255, 0.12);
+    --sheet-shadow: rgba(0, 0, 0, 0.7);
+    --scrim: rgba(0, 0, 0, 0.45);
+    --bead-a: #FFFFFF;
+    --bead-b: hsl(var(--h), calc(var(--k) * 50%), 77%);
+    --bead-c: hsl(var(--h), calc(var(--k) * 33%), 42%);
+    --bead-shadow: 0 0 10px 0 hsla(var(--h), calc(var(--k) * 130%), 79%, 0.45);
+    --w-halo: hsla(var(--h), calc(var(--k) * 130%), 74%, 0.2);
+    --w-streak: var(--h), calc(var(--k) * 200%), 89%;
+    --w-line1: hsla(var(--h), calc(var(--k) * 200%), 94%, 0.85);
+    --w-line2: hsla(var(--h), calc(var(--k) * 180%), 87%, 0.45);
+    --w-line3: hsla(var(--h), calc(var(--k) * 180%), 87%, 0.22);
+    --w-in1: hsla(var(--h), calc(var(--k) * 180%), 85%, 0.5);
+    --w-in2: hsla(var(--h), calc(var(--k) * 150%), 79%, 0.22);
+    --w-in3: hsla(var(--h), calc(var(--k) * 150%), 79%, 0.14);
+    --w-out: hsla(var(--h), calc(var(--k) * 150%), 79%, 0.5);
+    --w-out-shadow: 0 0 18px 0 hsla(var(--h), calc(var(--k) * 150%), 79%, 0.5);
+    --w-floor: hsla(var(--h), calc(var(--k) * 100%), 74%, 0.24);
+    --veil: #000000;
+    --veil-ink: #7C8794;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --g0: hsl(var(--h), calc(var(--k) * 52%), 18%);
+  --g1: hsl(var(--h), calc(var(--k) * 62%), 9.5%);
+  --g2: hsl(var(--h), calc(var(--k) * 75%), 4%);
+  --ink: hsl(var(--h), calc(var(--k) * 70%), 93%);
+  --muted: hsl(var(--h), calc(var(--k) * 40%), 74%);
+  --line: rgba(255, 255, 255, 0.22);
+  --line-soft: rgba(255, 255, 255, 0.08);
+  --pill: rgba(255, 255, 255, 0.04);
+  --pill-on: rgba(255, 255, 255, 0.13);
+  --sheet-a: hsla(var(--h), calc(var(--k) * 50%), 20%, 0.9);
+  --sheet-b: hsla(var(--h), calc(var(--k) * 60%), 10%, 0.88);
+  --sheet-edge: rgba(255, 255, 255, 0.12);
+  --sheet-shadow: rgba(0, 0, 0, 0.7);
+  --scrim: rgba(0, 0, 0, 0.45);
+  --bead-a: #FFFFFF;
+  --bead-b: hsl(var(--h), calc(var(--k) * 50%), 77%);
+  --bead-c: hsl(var(--h), calc(var(--k) * 33%), 42%);
+  --bead-shadow: 0 0 10px 0 hsla(var(--h), calc(var(--k) * 130%), 79%, 0.45);
+  --w-halo: hsla(var(--h), calc(var(--k) * 130%), 74%, 0.2);
+  --w-streak: var(--h), calc(var(--k) * 200%), 89%;
+  --w-line1: hsla(var(--h), calc(var(--k) * 200%), 94%, 0.85);
+  --w-line2: hsla(var(--h), calc(var(--k) * 180%), 87%, 0.45);
+  --w-line3: hsla(var(--h), calc(var(--k) * 180%), 87%, 0.22);
+  --w-in1: hsla(var(--h), calc(var(--k) * 180%), 85%, 0.5);
+  --w-in2: hsla(var(--h), calc(var(--k) * 150%), 79%, 0.22);
+  --w-in3: hsla(var(--h), calc(var(--k) * 150%), 79%, 0.14);
+  --w-out: hsla(var(--h), calc(var(--k) * 150%), 79%, 0.5);
+  --w-out-shadow: 0 0 18px 0 hsla(var(--h), calc(var(--k) * 150%), 79%, 0.5);
+  --w-floor: hsla(var(--h), calc(var(--k) * 100%), 74%, 0.24);
+  --veil: #000000;
+  --veil-ink: #7C8794;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  background: var(--g1);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.4;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+/* the ground: one soft pool of light, fixed behind everything */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(120% 70% at 50% 40%, var(--g0) 0%, var(--g1) 55%, var(--g2) 100%);
+}
+p, h2, ul { margin: 0; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* ---- the session screen ---- */
+.app {
+  position: relative;
+  height: 100%;
+  min-height: 500px;
+  max-width: 440px;
+  margin: 0 auto;
+  padding-block: 8px 16px;
+  padding-left: max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.top {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-inline: -8px;
+}
+.icon-btn {
+  width: 44px; height: 44px;
+  padding: 0; border: 0;
+  background: transparent;
+  color: var(--ink);
+  display: grid; place-items: center;
+  border-radius: 50%;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.tag {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.verse-box {
+  flex: 1 1 0;
+  min-height: 64px;
+  align-self: stretch;
+  display: flex;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.verse {
+  margin: auto;
+  width: 100%;
+  max-width: 340px;
+  text-align: center;
+  font-weight: 300;
+  font-size: 26px;
+  line-height: 1.34;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+.wisp-area {
+  flex: 1.5 1 0;
+  min-height: 160px;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.begin {
+  padding: 0; border: 0;
+  background: transparent;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 28px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.begin:disabled { opacity: 0.5; cursor: default; }
+.wisp-box {
+  display: block;
+  position: relative;
+  width: calc(196px * var(--ws, 1));
+  height: calc(196px * var(--ws, 1));
+}
+/* The wisp: a gust of air held in a sphere. Drawn at 196px and scaled to the room it has.
+   While music plays it leans toward the ear the sound is in (--pan) and swells with it (--lvl). */
+.wisp {
+  display: block;
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 196px; height: 196px;
+  margin: -98px 0 0 -98px;
+  transform: translateX(calc(var(--pan, 0) * 14px)) scale(calc(var(--ws, 1) * (1 + var(--lvl, 0) * 0.07)));
+}
+.wisp span { display: block; position: absolute; }
+.w-halo {
+  inset: -14px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, transparent 57%, var(--w-halo) 84%, transparent 100%);
+  filter: blur(9px);
+  opacity: calc(0.75 + var(--lvl, 0) * 0.25);
+}
+.w-s1, .w-s2 {
+  border-radius: 50%;
+  -webkit-mask-image: radial-gradient(closest-side, transparent 50%, #000 76%, #000 90%, transparent 100%);
+  mask-image: radial-gradient(closest-side, transparent 50%, #000 76%, #000 90%, transparent 100%);
+}
+.w-s1 {
+  inset: 0;
+  background: conic-gradient(from 20deg, hsla(var(--w-streak), 0) 0deg, hsla(var(--w-streak), 0.5) 50deg, hsla(var(--w-streak), 0) 120deg, hsla(var(--w-streak), 0.28) 190deg, hsla(var(--w-streak), 0) 250deg, hsla(var(--w-streak), 0.42) 310deg, hsla(var(--w-streak), 0) 360deg);
+  filter: blur(7px);
+  animation: wisp-turn 26s linear infinite;
+}
+.w-s2 {
+  inset: 18px;
+  opacity: 0.7;
+  background: conic-gradient(from 200deg, hsla(var(--w-streak), 0) 0deg, hsla(var(--w-streak), 0.37) 70deg, hsla(var(--w-streak), 0) 150deg, hsla(var(--w-streak), 0.28) 240deg, hsla(var(--w-streak), 0) 360deg);
+  filter: blur(6px);
+  animation: wisp-turn 38s linear infinite reverse;
+}
+.w-r2 {
+  inset: 0;
+  border: 1px solid var(--w-line2);
+  border-radius: 47% 53% 44% 56% / 55% 46% 54% 45%;
+  box-shadow: inset 0 0 34px 4px var(--w-in2);
+  filter: blur(2.5px);
+  animation: wisp-b 17s ease-in-out infinite alternate;
+}
+.w-r1 {
+  inset: 4px;
+  border: 1px solid var(--w-line1);
+  border-radius: 52% 48% 55% 45% / 47% 54% 46% 53%;
+  box-shadow: inset 0 0 22px 1px var(--w-in1), var(--w-out-shadow);
+  filter: blur(0.6px);
+  animation: wisp-a 11s ease-in-out infinite alternate;
+}
+.w-r3 {
+  inset: 26px;
+  border: 1px solid var(--w-line3);
+  border-radius: 56% 44% 50% 50% / 45% 55% 47% 53%;
+  box-shadow: inset 0 0 18px 0 var(--w-in3);
+  filter: blur(4px);
+  animation: wisp-c 23s ease-in-out infinite alternate;
+}
+@keyframes wisp-turn { to { transform: rotate(360deg); } }
+@keyframes wisp-a {
+  0% { border-radius: 52% 48% 55% 45% / 47% 54% 46% 53%; transform: rotate(0deg) scale(1); }
+  50% { border-radius: 45% 55% 48% 52% / 56% 44% 55% 45%; transform: rotate(20deg) scale(1.04); }
+  100% { border-radius: 56% 44% 51% 49% / 48% 53% 47% 52%; transform: rotate(-14deg) scale(0.97); }
+}
+@keyframes wisp-b {
+  0% { border-radius: 47% 53% 44% 56% / 55% 46% 54% 45%; transform: rotate(0deg) scale(1.02); }
+  50% { border-radius: 55% 45% 53% 47% / 46% 55% 45% 54%; transform: rotate(-26deg) scale(0.96); }
+  100% { border-radius: 49% 51% 57% 43% / 52% 47% 53% 48%; transform: rotate(16deg) scale(1.05); }
+}
+@keyframes wisp-c {
+  0% { border-radius: 56% 44% 50% 50% / 45% 55% 47% 53%; transform: rotate(0deg) scale(0.94); }
+  50% { border-radius: 44% 56% 54% 46% / 53% 46% 56% 44%; transform: rotate(34deg) scale(1.08); }
+  100% { border-radius: 51% 49% 45% 55% / 57% 44% 50% 50%; transform: rotate(-22deg) scale(1); }
+}
+.floor {
+  display: block;
+  margin-top: calc(22px * var(--ws, 1));
+  width: calc(156px * var(--ws, 1));
+  height: 16px;
+  background: radial-gradient(closest-side, var(--w-floor) 0%, transparent 100%);
+}
+.begin-label {
+  margin-top: 10px;
+  padding-left: 0.32em;
+  font-size: 14px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+
+.field {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+.ear {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  transition: color 120ms linear;
+}
+.ear.on { color: var(--ink); }
+.track { position: relative; flex: 1 1 auto; height: 24px; min-width: 0; }
+.track::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  height: 1px;
+  background: linear-gradient(90deg, var(--line-soft) 0%, var(--line) 50%, var(--line-soft) 100%);
+}
+.dot {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 10px; height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--bead-a) 0%, var(--bead-b) 50%, var(--bead-c) 100%);
+  box-shadow: var(--bead-shadow);
+  opacity: 0.45;
+  will-change: transform;
+}
+.dot.live { opacity: 1; }
+.melody-name {
+  margin-top: 14px;
+  font-size: 19px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.melody-meta {
+  margin-top: 2px;
+  font-size: 14px;
+  color: var(--muted);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.pills {
+  align-self: stretch;
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+.pill {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 124px;
+  height: 44px;
+  padding: 0 8px;
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background: var(--pill);
+  color: var(--ink);
+  font-size: 15px;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.pill:disabled { color: var(--muted); opacity: 0.55; cursor: default; }
+
+/* ---- the drawer ---- */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: var(--scrim);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.menu-open .scrim { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed;
+  top: 0; bottom: 0; left: 0;
+  z-index: 30;
+  width: min(312px, 86vw);
+  padding: calc(env(safe-area-inset-top, 0px) + 8px) 28px calc(env(safe-area-inset-bottom, 0px) + 22px) max(28px, env(safe-area-inset-left, 0px));
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: 0 40px 40px 0;
+  border-right: 1px solid var(--sheet-edge);
+  background: linear-gradient(180deg, var(--sheet-a) 0%, var(--sheet-b) 100%);
+  -webkit-backdrop-filter: blur(22px);
+  backdrop-filter: blur(22px);
+  box-shadow: 1px 0 0 var(--line-soft), 34px 0 60px -34px var(--sheet-shadow);
+  transform: translateX(-105%);
+  visibility: hidden;
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1), visibility 0s linear 0.35s;
+}
+.menu-open .drawer {
+  transform: none;
+  visibility: visible;
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1), visibility 0s;
+}
+.view { display: flex; flex-direction: column; min-height: 100%; }
+.view > .icon-btn { margin-left: -12px; flex: 0 0 auto; }
+.view-head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: -12px;
+  min-height: 44px;
+}
+.view-head h2 { font-weight: 300; font-size: 24px; line-height: 1.2; }
+.nav { display: flex; flex-direction: column; margin-top: 8px; }
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 46px;
+  padding: 0; border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-weight: 300;
+  font-size: 24px;
+  line-height: 1.2;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.nav-item.current { font-weight: 400; }
+.nav-item.soon { color: var(--muted); cursor: default; }
+.nav-note { margin: 2px 0 8px; font-size: 13px; color: var(--muted); }
+.mark {
+  display: block;
+  width: 12px; height: 12px;
+  border: 1px solid var(--w-line1);
+  border-radius: 52% 48% 55% 45% / 47% 54% 46% 53%;
+  box-shadow: inset 0 0 3px 0 var(--w-in1), 0 0 6px 1px var(--w-out);
+}
+.grow { flex: 1 1 auto; min-height: 16px; }
+.rule { height: 1px; background: linear-gradient(90deg, var(--line) 0%, var(--line-soft) 100%); }
+.label {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.rule + .label { margin-top: 18px; }
+.themes { display: flex; gap: 14px; margin-top: 14px; }
+.theme-opt {
+  width: 72px;
+  padding: 6px 0 4px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.theme-opt[aria-pressed="true"] { color: var(--ink); font-weight: 500; }
+/* The three swatches picture the themes themselves, so their lightness is fixed; only hue and depth follow the app. */
+.sw { display: block; position: relative; width: 40px; height: 40px; box-shadow: 0 0 0 1px var(--line); }
+.sw-ring { display: block; position: absolute; inset: 5px; border: 1px solid; border-radius: inherit; }
+.sw-orbit { display: none; position: absolute; inset: -6px; border: 1px solid var(--ink); border-radius: inherit; }
+.theme-opt[aria-pressed="true"] .sw-orbit { display: block; }
+.sw-system {
+  border-radius: 47% 53% 44% 56% / 55% 46% 54% 45%;
+  background: linear-gradient(135deg, hsl(var(--h), calc(var(--k) * 60%), 96%) 0%, hsl(var(--h), calc(var(--k) * 60%), 96%) 50%, hsl(var(--h), calc(var(--k) * 62%), 9.5%) 50%, hsl(var(--h), calc(var(--k) * 62%), 9.5%) 100%);
+  animation: wisp-b 17s ease-in-out infinite alternate;
+}
+.sw-system .sw-ring {
+  border-color: hsla(var(--h), calc(var(--k) * 68%), 33%, 0.85) hsla(var(--h), calc(var(--k) * 200%), 94%, 0.9) hsla(var(--h), calc(var(--k) * 200%), 94%, 0.9) hsla(var(--h), calc(var(--k) * 68%), 33%, 0.85);
+}
+.sw-light {
+  border-radius: 52% 48% 55% 45% / 47% 54% 46% 53%;
+  background: radial-gradient(circle at 40% 35%, #FFFFFF 0%, hsl(var(--h), calc(var(--k) * 60%), 93%) 70%, hsl(var(--h), calc(var(--k) * 50%), 87%) 100%);
+  animation: wisp-a 11s ease-in-out infinite alternate;
+}
+.sw-light .sw-ring {
+  border-color: hsla(var(--h), calc(var(--k) * 68%), 33%, 0.8);
+  box-shadow: inset 0 0 5px 0 hsla(var(--h), calc(var(--k) * 52%), 48%, 0.35), 0 0 4px 1px rgba(255, 255, 255, 0.95);
+}
+.sw-dark {
+  border-radius: 56% 44% 51% 49% / 48% 53% 47% 52%;
+  background: radial-gradient(circle at 40% 35%, hsl(var(--h), calc(var(--k) * 52%), 20%) 0%, hsl(var(--h), calc(var(--k) * 62%), 9.5%) 70%, hsl(var(--h), calc(var(--k) * 75%), 4%) 100%);
+  animation: wisp-a 14s ease-in-out infinite alternate-reverse;
+}
+.sw-dark .sw-ring {
+  border-color: hsla(var(--h), calc(var(--k) * 200%), 94%, 0.9);
+  box-shadow: inset 0 0 6px 0 hsla(var(--h), calc(var(--k) * 180%), 85%, 0.55), 0 0 6px 0 hsla(var(--h), calc(var(--k) * 150%), 79%, 0.6);
+}
+.foot { margin-top: 20px; font-size: 13px; line-height: 1.45; color: var(--muted); }
+
+/* ---- panels inside the drawer ---- */
+.panel { display: flex; flex-direction: column; gap: 18px; margin-top: 18px; padding-bottom: 8px; }
+.control { display: flex; flex-direction: column; gap: 2px; }
+.control-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.control-head label, .ctl-label { font-size: 16px; }
+.control-head output { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; }
+.hint { font-size: 13px; line-height: 1.45; color: var(--muted); }
+.rng {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 44px;
+  margin: 0;
+  background: transparent;
+  touch-action: pan-y;
+  --trk: linear-gradient(90deg, var(--line), var(--line));
+}
+.rng::-webkit-slider-runnable-track { height: 8px; border-radius: 4px; background: var(--trk); box-shadow: 0 0 0 1px var(--line-soft); }
+.rng::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 26px; height: 26px;
+  margin-top: -9px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: radial-gradient(circle at 35% 30%, var(--bead-a) 0%, var(--bead-b) 55%, var(--bead-c) 100%);
+  box-shadow: var(--bead-shadow);
+}
+.rng::-moz-range-track { height: 8px; border-radius: 4px; background: var(--trk); box-shadow: 0 0 0 1px var(--line-soft); }
+.rng::-moz-range-thumb {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: radial-gradient(circle at 35% 30%, var(--bead-a) 0%, var(--bead-b) 55%, var(--bead-c) 100%);
+  box-shadow: var(--bead-shadow);
+}
+#hue { --trk: linear-gradient(90deg, hsl(0, 70%, 60%), hsl(60, 70%, 52%), hsl(120, 55%, 50%), hsl(180, 60%, 48%), hsl(240, 70%, 66%), hsl(300, 60%, 60%), hsl(360, 70%, 60%)); }
+#depth { --trk: linear-gradient(90deg, hsl(var(--h), 0%, 58%), hsl(var(--h), 85%, 56%)); }
+.chip {
+  height: 56px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: radial-gradient(140% 160% at 30% 20%, var(--g0) 0%, var(--g1) 50%, var(--g2) 100%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 18px;
+  font-size: 15px;
+}
+.seg {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg label {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  min-height: 44px;
+  padding: 4px 6px;
+  border-radius: 13px;
+  font-size: 14px;
+  line-height: 1.2;
+  color: var(--muted);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.seg input:checked + label { background: var(--pill-on); color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
+.seg input:focus-visible + label { outline: 2px solid var(--ink); outline-offset: 2px; }
+.check-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.check-row .ctl-label { flex: 1 1 100%; }
+.btn {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background: var(--pill);
+  color: var(--ink);
+  font-size: 15px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.saved { list-style: none; padding: 0; display: flex; flex-direction: column; }
+.saved li { display: flex; flex-direction: column; gap: 8px; padding: 12px 0; border-bottom: 1px solid var(--line-soft); }
+.saved .info { min-width: 0; }
+.saved .name { font-size: 17px; overflow-wrap: anywhere; }
+.saved .meta { font-size: 13px; color: var(--muted); }
+.saved .row-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.empty { font-size: 15px; color: var(--muted); }
+details.notes { font-size: 14px; line-height: 1.45; color: var(--muted); }
+details.notes summary { color: var(--ink); cursor: pointer; padding: 11px 0; }
+details.notes ul { padding-left: 18px; display: flex; flex-direction: column; gap: 8px; }
+
+/* ---- short messages ---- */
+.toast {
+  position: fixed;
+  left: 50%;
+  top: calc(env(safe-area-inset-top, 0px) + 6px);
+  z-index: 40;
+  width: max-content;
+  max-width: min(300px, calc(100vw - 112px));
+  padding: 7px 14px;
+  border-radius: 18px;
+  border: 1px solid var(--sheet-edge);
+  background: linear-gradient(180deg, var(--sheet-a) 0%, var(--sheet-b) 100%);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 0 0 1px var(--line-soft), 0 18px 30px -18px var(--sheet-shadow);
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.3;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -6px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+.menu-open .toast {
+  top: auto;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+  max-width: min(300px, calc(100vw - 32px));
+}
+
+/* ---- the page going dark during a session ---- */
+.veil {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--veil);
+  color: var(--veil-ink);
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  text-align: center;
+  font-size: 0.9rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+.veil.on { opacity: 1; pointer-events: auto; transition: opacity 3s ease; }
+.veil p { opacity: 1; transition: opacity 0.2s ease; }
+.veil.on p { opacity: 0; transition: opacity 2.5s ease 5s; }
+body:has(.veil.on) .wisp span, body:has(.veil.on) .sw { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  .wisp span, .sw { animation: none !important; }
+  .veil, .veil.on, .veil p, .veil.on p, .scrim, .drawer, .menu-open .drawer, .toast { transition: none; }
+}
+
+/* ---- prompts: the row above the verse, the lists in the drawer, and search ---- */
+.verse-head { align-self: stretch; display: flex; align-items: center; justify-content: center; margin-inline: -8px; }
+.verse-head .icon-btn { flex: 0 0 auto; color: var(--muted); }
+.tag { flex: 0 1 auto; min-width: 0; padding: 0 6px; letter-spacing: 0.14em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fav[aria-pressed="true"] { color: var(--ink); }
+.fav[aria-pressed="true"] svg path { fill: currentColor; }
+.nav-item { min-height: 42px; font-size: 22px; }
+.menu-top { display: flex; align-items: center; gap: 4px; margin-left: -12px; }
+.menu-top .icon-btn { flex: 0 0 auto; }
+.search { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 20px; background: var(--pill); color: var(--muted); }
+.search svg { flex: 0 0 auto; }
+.search input { flex: 1 1 auto; min-width: 0; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; outline: 0; border-radius: 0; background: transparent; color: var(--ink); font: inherit; font-size: 16px; -webkit-appearance: none; appearance: none; }
+.search input::placeholder { color: var(--muted); opacity: 1; }
+.search input::-webkit-search-cancel-button, .search input::-webkit-search-decoration { -webkit-appearance: none; }
+.search:focus-within { outline: 2px solid var(--ink); outline-offset: 2px; }
+.menu-body { flex: 1 1 auto; display: flex; flex-direction: column; }
+.plist { list-style: none; padding: 0; display: flex; flex-direction: column; }
+.plist li { display: flex; align-items: center; gap: 2px; border-bottom: 1px solid var(--line-soft); }
+.prow { flex: 1 1 auto; min-width: 0; min-height: 48px; padding: 9px 0; border: 0; background: transparent; color: var(--ink); text-align: left; display: flex; flex-direction: column; gap: 2px; cursor: pointer; touch-action: manipulation; }
+.prow.current .ptext { font-weight: 500; }
+.ptag { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.ptext { font-size: 15px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.plist .icon-btn { flex: 0 0 auto; margin-right: -10px; color: var(--muted); }
+.plist .fav[aria-pressed="true"] { color: var(--ink); }
+.about { display: flex; flex-direction: column; gap: 10px; font-size: 15px; line-height: 1.45; }
+.learn { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <header class="top">
+    <button type="button" class="icon-btn" id="menuBtn" aria-label="Open menu" aria-controls="drawer" aria-expanded="false">
+      <svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" aria-hidden="true"><path d="M3 7h14M3 13h9"></path></svg>
+    </button>
+    <button type="button" class="icon-btn" id="themeBtn" aria-label="Switch between light and dark">
+      <svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.1" aria-hidden="true"><circle cx="10" cy="10" r="6.25"></circle><path d="M10 3.75a6.25 6.25 0 0 0 0 12.5z" fill="currentColor"></path></svg>
+    </button>
+  </header>
+
+  <div class="verse-head">
+    <button type="button" class="icon-btn" id="shuffleBtn" aria-label="Show another prompt">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.5 10a5.5 5.5 0 1 1-1.7-4"></path><path d="M14.2 2.8V6H11"></path></svg>
+    </button>
+    <button type="button" class="tag" id="verseTag">Yoga Sutras · 1.2</button>
+    <button type="button" class="icon-btn fav" id="favBtn" aria-label="Save this prompt" aria-pressed="false"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h8v13l-4-3-4 3z"></path></svg></button>
+  </div>
+  <div class="verse-box" id="verseBox">
+    <p class="verse" id="verse">Watch the mind’s surface the way you would watch water. Do not push the ripples down. Let them settle, and rest in the stillness that is left.</p>
+  </div>
+
+  <div class="wisp-area" id="wispArea">
+    <button type="button" class="begin" id="mainBtn">
+      <span class="wisp-box" aria-hidden="true">
+        <span class="wisp" id="wisp">
+          <span class="w-halo"></span>
+          <span class="w-s1"></span>
+          <span class="w-s2"></span>
+          <span class="w-r2"></span>
+          <span class="w-r1"></span>
+          <span class="w-r3"></span>
+        </span>
+      </span>
+      <span class="floor" aria-hidden="true"></span>
+      <span class="begin-label" id="mainLabel">Begin</span>
+    </button>
+  </div>
+
+  <div class="field" aria-hidden="true">
+    <span class="ear" id="earL">L</span>
+    <div class="track" id="track"><div class="dot" id="dot"></div></div>
+    <span class="ear" id="earR">R</span>
+  </div>
+
+  <p class="melody-name" id="melodyName">No melody yet</p>
+  <p class="melody-meta"><span id="melodyMeta">Every session composes a new one</span><span id="clockWrap" hidden> · <span id="clock" aria-label="Session time">0:00</span></span></p>
+
+  <div class="pills">
+    <button type="button" class="pill" id="saveBtn" disabled>Save</button>
+    <button type="button" class="pill" id="nextBtn" aria-label="Next melody" disabled>Next</button>
+    <button type="button" class="pill" id="soundBtn">Sound</button>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+
+<aside class="drawer" id="drawer" aria-label="Menu" inert>
+
+  <div class="view" data-view="menu">
+    <div class="menu-top">
+      <button type="button" class="icon-btn" id="closeBtn" aria-label="Close menu">
+        <svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15"></path></svg>
+      </button>
+      <label class="search" for="searchBox">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="9" r="5.2"></circle><path d="M13 13l4 4"></path></svg>
+        <input type="search" id="searchBox" placeholder="Search prompts" aria-label="Search prompts" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
+      </label>
+    </div>
+    <div class="menu-body" id="menuBody">
+    <nav class="nav" aria-label="Sections">
+      <button type="button" class="nav-item current" id="navSession" aria-current="page"><span class="mark" aria-hidden="true"></span><span>Session</span></button>
+      <button type="button" class="nav-item" data-go="sec-ys">Yoga Sutras</button>
+      <button type="button" class="nav-item" data-go="sec-vbt">Vigyan Bhairav Tantra</button>
+      <button type="button" class="nav-item" data-go="sec-zen">Zen Koans</button>
+      <button type="button" class="nav-item" data-go="sec-jew">Jewish Sources</button>
+      <button type="button" class="nav-item" data-go="favs">Saved Prompts</button>
+      <button type="button" class="nav-item" data-go="saved">Saved Melodies</button>
+      <button type="button" class="nav-item" data-go="sound">Sound</button>
+      <button type="button" class="nav-item" data-go="color">Color</button>
+    </nav>
+    <div class="grow"></div>
+    <div class="rule" aria-hidden="true"></div>
+    <p class="label" id="themeLabel">Theme</p>
+    <div class="themes" role="group" aria-labelledby="themeLabel">
+      <button type="button" class="theme-opt" data-theme-set="system" aria-pressed="true">
+        <span class="sw sw-system" aria-hidden="true"><span class="sw-ring"></span><span class="sw-orbit"></span></span>
+        <span>System</span>
+      </button>
+      <button type="button" class="theme-opt" data-theme-set="light" aria-pressed="false">
+        <span class="sw sw-light" aria-hidden="true"><span class="sw-ring"></span><span class="sw-orbit"></span></span>
+        <span>Light</span>
+      </button>
+      <button type="button" class="theme-opt" data-theme-set="dark" aria-pressed="false">
+        <span class="sw sw-dark" aria-hidden="true"><span class="sw-ring"></span><span class="sw-orbit"></span></span>
+        <span>Dark</span>
+      </button>
+    </div>
+    <p class="foot">An experiment in mindfulness. Not a substitute for therapy.</p>
+    </div>
+    <div class="panel" id="searchBody" hidden>
+      <p class="hint" id="searchCount" role="status"></p>
+      <ul class="plist" id="searchList"></ul>
+    </div>
+  </div>
+
+  <div class="view" data-view="section" hidden>
+    <div class="view-head">
+      <button type="button" class="icon-btn" data-back aria-label="Back to menu"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l-6 6 6 6"></path></svg></button>
+      <h2 id="secTitle"></h2>
+    </div>
+    <div class="panel">
+      <div class="about" id="secAbout"></div>
+      <p class="hint" id="secNote"></p>
+      <ul class="plist" id="secList"></ul>
+      <a class="btn learn" id="secLearn" href="#" target="_blank" rel="noopener noreferrer">Learn more</a>
+      <p class="hint" id="secLearnNote"></p>
+    </div>
+  </div>
+
+  <div class="view" data-view="favs" hidden>
+    <div class="view-head">
+      <button type="button" class="icon-btn" data-back aria-label="Back to menu"><svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l-6 6 6 6"></path></svg></button>
+      <h2>Saved Prompts</h2>
+    </div>
+    <div class="panel">
+      <ul class="plist" id="favList"></ul>
+      <p class="empty" id="favEmpty">Nothing saved yet. When a prompt stays with you, tap the bookmark beside it and it will wait here.</p>
+      <p class="hint">Saved prompts are kept on this device.</p>
+    </div>
+  </div>
+
+  <div class="view" data-view="sound" hidden>
+    <div class="view-head">
+      <button type="button" class="icon-btn" data-back aria-label="Back to menu">
+        <svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l-6 6 6 6"></path></svg>
+      </button>
+      <h2>Sound</h2>
+    </div>
+    <div class="panel">
+      <!-- The Hop movement is parked. Its switch stays here, hidden; HOP_ENABLED in the script brings it back. -->
+      <div class="control" id="movementControl" hidden>
+        <span class="ctl-label" id="modeLabel">Movement</span>
+        <div class="seg" role="radiogroup" aria-labelledby="modeLabel">
+          <input type="radio" name="mode" id="modeGlide" value="glide" checked>
+          <label for="modeGlide">Glide</label>
+          <input type="radio" name="mode" id="modeHop" value="hop">
+          <label for="modeHop">Hop</label>
+        </div>
+        <p class="hint" id="modeHint">One continuous sound drifting from ear to ear.</p>
+      </div>
+
+      <div class="control">
+        <div class="control-head">
+          <label for="speed">Speed</label>
+          <output id="speedOut" for="speed">1.5 s per pass</output>
+        </div>
+        <input type="range" class="rng" id="speed" min="0" max="100" step="1" value="52">
+      </div>
+      <div class="control">
+        <div class="control-head">
+          <label for="pitch">Pitch</label>
+          <output id="pitchOut" for="pitch">Key of A</output>
+        </div>
+        <input type="range" class="rng" id="pitch" min="-5" max="5" step="1" value="0">
+      </div>
+      <div class="control">
+        <div class="control-head">
+          <label for="volume">Volume</label>
+          <output id="volumeOut" for="volume">70%</output>
+        </div>
+        <input type="range" class="rng" id="volume" min="0" max="100" step="1" value="70">
+      </div>
+
+      <div class="check-row">
+        <span class="ctl-label">Check your earbuds</span>
+        <button type="button" class="btn" id="testL">Left ear</button>
+        <button type="button" class="btn" id="testR">Right ear</button>
+      </div>
+
+      <div class="control">
+        <span class="ctl-label" id="h-screen">Screen during a session</span>
+        <div class="seg" role="radiogroup" aria-labelledby="h-screen">
+          <input type="radio" name="screen" id="screenDark" value="dark" checked>
+          <label for="screenDark">Go dark</label>
+          <input type="radio" name="screen" id="screenSleep" value="sleep">
+          <label for="screenSleep">Let the phone sleep</label>
+        </div>
+        <p class="hint" id="screenHint"></p>
+      </div>
+
+      <details class="notes">
+        <summary>If something sounds wrong on iPhone</summary>
+        <ul>
+          <li>No sound at all: raise the volume with the slider above, and check that the earbuds are connected.</li>
+          <li>The sound does not move, or both ears hear the same thing: in Settings, open Accessibility, then Audio &amp; Visual, and turn Mono Audio off.</li>
+          <li>The music stops when the phone locks: that happens when this page is opened inside Claude. Choose Go dark, or open the app at its own address.</li>
+          <li>The music is silent after you come back from another app: press Resume, or Stop and then Begin.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+
+  <div class="view" data-view="saved" hidden>
+    <div class="view-head">
+      <button type="button" class="icon-btn" data-back aria-label="Back to menu">
+        <svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l-6 6 6 6"></path></svg>
+      </button>
+      <h2>Saved Melodies</h2>
+    </div>
+    <div class="panel">
+      <ul class="saved" id="savedList"></ul>
+      <p class="empty" id="savedEmpty">Nothing saved yet. When a melody stays with you, press Save and it will wait here.</p>
+      <p class="hint" id="storeNote">Saved melodies are kept on this device.</p>
+    </div>
+  </div>
+
+  <div class="view" data-view="color" hidden>
+    <div class="view-head">
+      <button type="button" class="icon-btn" data-back aria-label="Back to menu">
+        <svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l-6 6 6 6"></path></svg>
+      </button>
+      <h2>Color</h2>
+    </div>
+    <div class="panel">
+      <div class="chip" aria-hidden="true"><span class="mark"></span><span id="colorName">Steel</span></div>
+      <div class="control">
+        <div class="control-head">
+          <label for="hue">Hue</label>
+          <output id="hueOut" for="hue">Azure</output>
+        </div>
+        <input type="range" class="rng" id="hue" min="0" max="360" step="1" value="212">
+      </div>
+      <div class="control">
+        <div class="control-head">
+          <label for="depth">Depth</label>
+          <output id="depthOut" for="depth">40%</output>
+        </div>
+        <input type="range" class="rng" id="depth" min="0" max="100" step="1" value="40">
+      </div>
+      <p class="hint">Hue picks the color and Depth sets how much of it there is, from plain grey to full. How light or dark it is follows the theme, so the words stay readable in any color.</p>
+      <div><button type="button" class="btn" id="colorReset">Back to steel</button></div>
+    </div>
+  </div>
+</aside>
+
+<p class="toast" id="status" role="status"></p>
+<div class="veil" id="veil" aria-hidden="true"><p>Tap anywhere to bring the page back.</p></div>
+
+<script>
+/* =====================================================================
+   LOOK AND LAYOUT — theme, colour, the drawer, the verse and the wisp.
+   Runs before the sound script and hands it a few hooks on window.__ui.
+   ===================================================================== */
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var root = document.documentElement, body = document.body;
+  var clamp = function (v, lo, hi) { return Math.min(hi, Math.max(lo, v)); };
+
+  /* ---- theme and colour ---- */
+  var LS_LOOK = 'bst.look.v1';
+  var STEEL = { hue: 212, depth: 40 };
+  var look = { theme: 'system', hue: STEEL.hue, depth: STEEL.depth };
+  try {
+    var s = JSON.parse(localStorage.getItem(LS_LOOK) || 'null');
+    if (s) {
+      if (s.theme === 'light' || s.theme === 'dark' || s.theme === 'system') look.theme = s.theme;
+      if (typeof s.hue === 'number') look.hue = clamp(Math.round(s.hue), 0, 360);
+      if (typeof s.depth === 'number') look.depth = clamp(Math.round(s.depth), 0, 100);
+    }
+  } catch (e) {}
+
+  var darkQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  var setThemeAttr = false;            // only take the attribute back off if this page put it there
+  function shownTheme() {
+    var a = root.getAttribute('data-theme');
+    if (a === 'dark' || a === 'light') return a;
+    return darkQuery && darkQuery.matches ? 'dark' : 'light';
+  }
+  var HUE_NAMES = ['Red', 'Orange', 'Yellow', 'Lime', 'Green', 'Mint', 'Cyan', 'Azure', 'Blue', 'Violet', 'Magenta', 'Rose'];
+  function hueName(h) { return HUE_NAMES[Math.round(h / 30) % 12]; }
+
+  function applyLook(store) {
+    root.style.setProperty('--h', String(look.hue));
+    root.style.setProperty('--k', (look.depth / 100).toFixed(2));
+    if (look.theme === 'system') {
+      if (setThemeAttr) { root.removeAttribute('data-theme'); setThemeAttr = false; }
+    } else {
+      root.setAttribute('data-theme', look.theme);
+      setThemeAttr = true;
+    }
+    var opts = document.querySelectorAll('[data-theme-set]');
+    for (var i = 0; i < opts.length; i++) {
+      opts[i].setAttribute('aria-pressed', opts[i].getAttribute('data-theme-set') === look.theme ? 'true' : 'false');
+    }
+    $('hue').value = look.hue;
+    $('depth').value = look.depth;
+    $('hueOut').textContent = hueName(look.hue);
+    $('depthOut').textContent = look.depth + '%';
+    var isSteel = look.hue === STEEL.hue && look.depth === STEEL.depth;
+    $('colorName').textContent = isSteel ? 'Steel' : look.depth === 0 ? 'Grey' : hueName(look.hue);
+    $('colorReset').disabled = isSteel;
+    if (store) { try { localStorage.setItem(LS_LOOK, JSON.stringify(look)); } catch (e) {} }
+    paintBar();
+  }
+  function paintBar() {                // the phone's own bar above the page, where the page is allowed to tint it
+    try {
+      var meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', getComputedStyle(body).backgroundColor);
+    } catch (e) {}
+  }
+  $('themeBtn').addEventListener('click', function () {
+    look.theme = shownTheme() === 'dark' ? 'light' : 'dark';
+    applyLook(true);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-theme-set]'), function (b) {
+    b.addEventListener('click', function () { look.theme = b.getAttribute('data-theme-set'); applyLook(true); });
+  });
+  $('hue').addEventListener('input', function () { look.hue = clamp(Math.round(+this.value), 0, 360); applyLook(true); });
+  $('depth').addEventListener('input', function () { look.depth = clamp(Math.round(+this.value), 0, 100); applyLook(true); });
+  $('colorReset').addEventListener('click', function () { look.hue = STEEL.hue; look.depth = STEEL.depth; applyLook(true); });
+  if (darkQuery) {
+    var onScheme = function () { paintBar(); };
+    if (darkQuery.addEventListener) darkQuery.addEventListener('change', onScheme);
+    else if (darkQuery.addListener) darkQuery.addListener(onScheme);
+  }
+
+  /* ---- the drawer ---- */
+  var drawer = $('drawer'), app = $('app'), lastFocus = null;
+  var views = drawer.querySelectorAll('.view');
+  function showView(name) {
+    var shown = null;
+    for (var i = 0; i < views.length; i++) {
+      var on = views[i].getAttribute('data-view') === name;
+      views[i].hidden = !on;
+      if (on) shown = views[i];
+    }
+    drawer.scrollTop = 0;
+    return shown;
+  }
+  function isOpen() { return body.classList.contains('menu-open'); }
+  function openDrawer(name) {
+    if (!isOpen()) lastFocus = document.activeElement;
+    clearSearch();
+    var v = showView(name || 'menu');
+    body.classList.add('menu-open');
+    drawer.removeAttribute('inert');
+    app.setAttribute('inert', '');
+    $('menuBtn').setAttribute('aria-expanded', 'true');
+    var first = v && v.querySelector('button');
+    if (first) { try { first.focus({ preventScroll: true }); } catch (e) {} }
+  }
+  function closeDrawer() {
+    if (!isOpen()) return;
+    body.classList.remove('menu-open');
+    drawer.setAttribute('inert', '');
+    app.removeAttribute('inert');
+    $('menuBtn').setAttribute('aria-expanded', 'false');
+    if (lastFocus && lastFocus.focus) { try { lastFocus.focus({ preventScroll: true }); } catch (e) {} }
+  }
+  $('menuBtn').addEventListener('click', function () { openDrawer('menu'); });
+  $('soundBtn').addEventListener('click', function () { openDrawer('sound'); });
+  $('closeBtn').addEventListener('click', closeDrawer);
+  $('navSession').addEventListener('click', closeDrawer);
+  $('scrim').addEventListener('click', closeDrawer);
+  function focusFirst(v) {
+    var first = v && v.querySelector('button');
+    if (first) { try { first.focus({ preventScroll: true }); } catch (e) {} }
+  }
+  drawer.addEventListener('click', function (ev) {
+    var t = ev.target && ev.target.closest ? ev.target.closest('[data-fav],[data-prompt],[data-go],[data-back]') : null;
+    if (!t) return;
+    if (t.hasAttribute('data-fav')) { toggleFav(t.getAttribute('data-fav')); return; }
+    if (t.hasAttribute('data-prompt')) { showPrompt(BY_ID[t.getAttribute('data-prompt')]); closeDrawer(); return; }
+    var go = t.hasAttribute('data-back') ? 'menu' : t.getAttribute('data-go');
+    var v = go.indexOf('sec-') === 0 ? openSection(go.slice(4)) : go === 'favs' ? openFavs() : showView(go);
+    focusFirst(v);
+  });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') closeDrawer(); });
+
+  /* ---- the verse: the text grows or shrinks until it fills the room it has ---- */
+  // The prompts. Each is our own wording of a verse, case or passage, tagged with its source.
+  // One entry per section: key, name, tag prefix, a note, a Learn more link, and [reference, text] pairs.
+  var SECTIONS = [{"key":"ys","name":"Yoga Sutras","tag":"Yoga Sutras · ","note":"40 prompts, each in our own wording and tagged with its sutra.","learn":"https://sacred-texts.com/hin/ysp/index.htm","learnNote":"Opens the Yoga Sutras in Charles Johnston’s translation at sacred-texts.com. Numbers here follow the standard Sanskrit numbering.","items":[["1.2","Watch the mind’s surface the way you would watch water. Do not push the ripples down. Let them settle, and rest in the stillness that is left."],["1.3","When the mind grows quiet, notice who is watching. Rest there, as the one who sees, with nothing to do."],["1.4","Notice how you take the shape of each thought as it passes: worried, pleased, busy. Step back one pace and watch the shape instead of wearing it."],["1.12","Two things quiet the mind: returning, and letting go. Return to the breath. Let go of the last thought. Repeat, gently."],["1.13","Practice is only this: the effort to stay. Choose stillness now, and each time you drift, choose it again."],["1.14","Do not look for results today. Sit as you would tend something slow-growing: for a long time, without gaps, with care."],["1.15","Bring to mind something you want. Feel the pull of it. Then, for this breath, need nothing from it, and notice the freedom in that."],["1.20","Gather five things as you sit: trust, energy, remembering, steadiness, clear seeing. Find even a trace of each in you now."],["1.23","For a few breaths, stop steering. Offer this sitting to something greater than yourself, and let it carry the effort."],["1.27–28","Sound Om inwardly, slow and long. Do not only repeat it; lean on what it points to. Let each repetition turn you further inward."],["1.32","Choose one thing and stay with it: one breath, one sound, one point. When scattering begins, return to the one."],["1.33","Think of someone who is happy, and be glad with them. Think of someone in pain, and let yourself soften. Whoever comes to mind next, meet them evenly. Feel the mind grow clear."],["1.34","Breathe out slowly and completely. Rest for a moment in the quiet after the breath has left, and let the next one come by itself."],["1.35","Give your whole attention to one fine sensation: air at the nostrils, or the faintest sound you can hear. Let that one sensation hold the mind steady."],["1.36","Turn toward a light within you, quiet and steady, which sorrow does not reach. Let the mind rest in its glow."],["1.37","Bring to mind someone who seems free of wanting, at ease in themselves. Hold their calm in view, and let your own mind take its shape."],["1.38","Recall the ease of deep, dreamless sleep: nothing to hold, nothing missing. Let a little of that ease into this waking moment."],["1.39","Rest your attention on anything that draws it kindly: an image, a sound, a place you love. Stay with what steadies you."],["1.41","Let the mind become clear as a crystal, taking the colour of whatever it rests on. Rest it on the breath, and become only breathing."],["1.43","Look at one thing, or hear one sound, without its name and without what you remember of it. Let it stand there alone, shining as it is."],["2.7–8","Notice the pull toward what pleases you and the push away from what does not. Watch both as movements in the mind. For this moment, follow neither."],["2.11","When the mind churns, do not argue with it. Sit, and watch the churning. Watched steadily, it thins."],["2.16","Notice a worry about something that has not happened. It has not come. Set it down, and return to this breath."],["2.20","Something in you only sees. It watches thoughts without becoming them. Look for the one who is looking."],["2.33","When a harsh thought arises, call up its opposite. Against irritation, kindness. Against restlessness, patience. Hold the opposite until it settles in."],["2.35","Resolve, for this sitting, to wish harm to no one, yourself included. Feel what softens around you when nothing in you is hostile."],["2.42","Count nothing that is missing. Let what is here be enough: this breath, this seat, this moment. Feel the quiet happiness in enough."],["2.46–47","Sit so that you are steady and at ease. Let go of the effort of holding yourself up. Let your attention widen toward what has no edge."],["2.48","Notice warm and cool, comfort and discomfort, liking and disliking. Sit steadily in the middle, and let the pairs pass without moving you."],["2.50","Watch the breath: out, in, and the pause between. Notice where it reaches and how long it lasts. Let it grow long and fine."],["2.51","Let the breath become so quiet that you stop counting in and out. Rest in the stillness that is neither one."],["2.52","Follow the quiet breath and imagine a thin veil lifting, a little with each exhale. Let the light behind it show."],["2.54","Let the senses turn back from their objects, the way a hand lets go. Sounds may continue; you need not go out to meet them. Follow the mind inward."],["3.1–2","Choose one place for your attention and rest it there. When it wanders, return. Stay until the returning becomes one unbroken flow."],["3.3","Stay with one object until there is only the object. Let the one who is meditating fall away, and let it shine alone."],["3.10","Each time you settle, the settling leaves a trace. Trust those traces. Let calm flow by itself, like a stream that has found its bed."],["3.11","Feel the mind that runs toward everything. Let it tire. Feel the mind that rests on one thing, and let it rise."],["3.12","One thought fades and the next arises. Let both be the same thought, the same breath, the same point. Rest in that sameness."],["4.3","You do not have to make the water flow. Like a farmer opening a gate in the field, remove what blocks it, and let stillness run in by itself."],["4.19","The mind does not light itself; it is something seen. Watch your thoughts as you would watch clouds, and notice the light they are seen by."]],"about":["The Yoga Sutras are a short Sanskrit work attributed to the sage Patanjali. Scholars have dated it anywhere between 500 BCE and 450 CE, and most now favour the later end. In just under two hundred brief aphorisms, arranged in four books, it describes yoga as the stilling of the mind’s movements and sets out an eightfold path that leads there.","Most of the prompts here come from the first two books, which deal with practice: steadying attention, the breath, posture, and the attitudes that clear the mind."]},{"key":"vbt","name":"Vigyan Bhairav Tantra","tag":"Vigyan Bhairav · Verse ","note":"40 prompts, each in our own wording and tagged with its verse.","learn":"https://en.wikipedia.org/wiki/Vij%C3%B1%C4%81na_Bhairava_Tantra","learnNote":"Opens the Wikipedia article on the text, which lists the published translations. Numbers here are verse numbers, not the 1 to 112 practice numbers some books use.","items":[["24","Follow the breath in until it turns. Follow it out until it turns. Rest at those two turning points, and feel how full they are."],["26","Find the moment when the breath neither goes out nor comes in. In that still centre, with no thought, rest."],["33","Rest your attention on empty space, or on a bare wall. Ask nothing of it. Let attention dissolve there by itself."],["38","Listen for the sound no one is making: unbroken, like a far river, in the hollow of the ear. Stay with it."],["39","Sound a long Om, inwardly or aloud. Follow it to its last trace. Rest in the quiet where it ends."],["40","Take any sound. Notice the silence just before it begins and just after it ends. Rest in those two silences."],["41","Listen to one long note from the strings. Stay with it as it thins, all the way to where it ends. Let your attention open into the space it leaves."],["43","Feel open space in every direction at once: in front, behind, above, below, and through the body. Hold no thought. Let everything become space."],["44","Feel emptiness above you and emptiness beneath you, both at once. Let the body rest between them, weightless."],["48","Feel your skin as a thin wall. Imagine there is nothing inside it: only open space. Rest in that."],["49","Close your eyes and let your senses sink into the space of the heart, as into the cup of a lotus. Stay there with undivided attention."],["58","Think of all this, everything around you, as open and empty. Let the mind dissolve into that openness."],["59","Look into an empty cup or bowl. Ignore its sides; attend only to the space inside. Let your mind rest in that space."],["60","Rest your gaze on a wide, open place, with no trees, hills or walls. Let the mind spread out until it grows quiet."],["61","Hold two things in mind, two sounds or two thoughts. Then let both go at once, and rest in the gap between them."],["64","Notice where the in-breath meets the out-breath, and where the out-breath meets the in-breath. At that meeting point, feel an evenness arise."],["71","When gladness rises, as on seeing someone dear after a long time, turn toward the gladness itself. Stay with the feeling and let its cause fall away."],["72","Take a sip or a bite, slowly. Follow the pleasure of the taste as it opens. Rest in the fullness it leaves."],["73","Let the music fill you until there is no one listening, only the music. Become the pleasure of the sound."],["74","Wherever the mind finds contentment, let it stay there. Do not move on. Rest in the contentment itself."],["75","Find the threshold where the outer world has faded and sleep has not yet come. Hover there, quietly awake."],["76","Rest your eyes on space dappled with light, from the sun or a lamp. Keep your gaze there, soft and steady."],["80","Fix your gaze steadily on one object. Do not look away, and do not think about it. Soon the mind has nothing to lean on. Rest there."],["82","Sitting or lying down, imagine nothing is holding your body up. Let it float, unsupported. Let the mind thin out with it."],["83","Let your body sway, very slowly, as if carried in a moving cart. As the swaying calms, let the mind calm with it."],["84","Look into a clear sky without moving your eyes. Stay perfectly still. Let the sky’s openness become your own."],["88","Close your eyes and look into the darkness in front of you. Let it widen. Rest in it as in something vast."],["92","Imagine yourself as open sky, with no boundary in any direction. Let awareness rest on nothing at all."],["96","When a wish springs up, look straight at it. Do not follow it. Let it settle back into the place it rose from."],["97","Before any wish arose in you, before any thought, who were you? Rest as that."],["103","Do not let the mind settle on what hurts, or on what pleases. Find the middle between them, and see what remains there."],["108","Give the mind nothing to stand on. When a thought forms, do not build on it. Rest without support."],["110","As waves rise from water, flames from fire and rays from the sun, let everything you notice rise from one awareness. Watch the waves, and rest as the water."],["116","Wherever your mind goes, outward or inward, let that be the place of stillness. Since it is everywhere, there is nowhere else to go."],["120","Rest your eyes on any object. Slowly draw your gaze back from it, then your thought of it. Stay in the emptiness that is left."],["125","Imagine praise, then blame. A friend, then someone difficult. Meet each with the same even mind. Rest in what is full and lacks nothing."],["126","For this moment, push nothing away and pull nothing toward you. Between the two, feel something wide begin to open."],["128","Send your attention out into open space: endless, empty, holding nothing up. Let the mind enter that spaciousness."],["129","Wherever the mind lands, lift it off at once. Let it find nowhere to settle. Watch it grow still, like water with no waves."],["136","Pleasure and pain reach you through the senses. Let go of the senses for a while, and rest at ease in yourself."]],"about":["The Vigyan Bhairav Tantra (Vijñāna Bhairava) is a Sanskrit text from the Shaiva tantric tradition of Kashmir, thought to date from around the seventh or eighth century. It is framed as a conversation: the Goddess asks Bhairava, a form of Shiva, about the nature of reality, and he answers with about 112 brief practices.","Each practice takes an ordinary experience, such as a breath, a sound, an open sky or a moment of joy, as a doorway into stillness. The prompts here keep to the gentler ones."]},{"key":"zen","name":"Zen Koans","tag":"Gateless Gate · Case ","note":"30 koans, each tagged with its case number.","learn":"https://sacred-texts.com/bud/glg/","learnNote":"Opens The Gateless Gate in the Senzaki and Reps translation at sacred-texts.com. That translation swaps cases 37 and 38; numbers here follow the usual order.","items":[["1","A monk asked Joshu, “Does a dog have Buddha-nature?” Joshu said, “Mu.” Breathe out on that one sound. Let the question go with it."],["6","Before a great gathering, the Buddha held up a flower and said nothing. Only Kashapa smiled. Look at one thing in front of you, and say nothing about it."],["7","A new monk asked Joshu to teach him. “Have you eaten your porridge?” “I have.” “Then wash your bowl.” What is the one simple thing in front of you now?"],["8","Getsuan asked: take a cart wheel and remove the hub that joins the spokes. What becomes of the wheel? Take away your name, your plans, your story. What is left sitting here?"],["9","A monk asked why a Buddha who sat for ten ages never awakened. “Your question answers itself,” said Seijo. “He did not become a Buddha.” Sit without waiting to become anything."],["10","Seizei said, “I am alone and poor. Please help me.” Sozan called his name. “Yes?” “You have drunk three cups of the finest wine, and still you say your lips are dry.” Notice what you have already been given."],["12","Every day Zuigan called out to himself, “Master!” and answered, “Yes.” “Be awake.” “Yes.” “Do not be fooled.” “Yes.” Call yourself by name, inwardly. Answer."],["16","Ummon said, “The world is vast and wide. Why do you put on your robe at the sound of the bell?” Hear the next sound. Notice what in you moves to answer it."],["17","The National Teacher called his attendant three times. Three times the attendant answered, “Yes.” Something is calling you now: a sound, a breath. Answer it with your whole attention."],["18","A monk asked Tozan, who was weighing flax, “What is Buddha?” Tozan said, “Three pounds of flax.” Feel the plain weight of what is here: your hands, your breath."],["19","Joshu asked, “What is the Way?” Nansen said, “Ordinary mind is the Way.” “Can I aim for it?” “The moment you aim, you turn from it.” Sit without aiming."],["21","A monk asked Ummon, “What is Buddha?” Ummon said, “A dried dung-stick.” Rest your attention on the plainest thing near you. Nothing is left out."],["22","Ananda asked what else the Buddha had handed down. Kashapa called, “Ananda!” “Yes?” “Take down the banner at the gate.” When your name is called, notice who answers."],["23","The Sixth Patriarch said, “Think neither good nor bad. At this very moment, what is your true self?” Set good and bad aside for one breath. Look."],["24","A monk asked how to speak the truth without words and without silence. Fuketsu answered with spring in the south: birds singing among the flowers. Let one sound fill you, with no words for it."],["25","In a dream Kyozan was called on to teach. He struck the gavel and said, “The truth is beyond words and beyond thought.” Listen to what is left when the words stop."],["27","A monk asked Nansen, “Is there a teaching no one has ever taught?” “There is.” “What is it?” “It is not mind, it is not Buddha, it is not things.” Rest in what has no name."],["28","Late at night Tokusan stepped out into the dark. Ryutan handed him a lit candle and, as he took it, blew it out. Close your eyes. What do you see by when the light is gone?"],["29","Two monks argued over a flag. “The flag is moving.” “The wind is moving.” The Sixth Patriarch said: neither, your mind is moving. Watch what moves in you now."],["30","Daibai asked Baso, “What is Buddha?” Baso said, “This very mind is Buddha.” Do not look elsewhere. Look at the mind that is looking."],["32","A philosopher asked the Buddha for the truth beyond words and beyond silence. The Buddha simply sat. The philosopher bowed and thanked him. Sit like that."],["33","A monk asked Baso, “What is Buddha?” Baso said, “Not mind, not Buddha.” Whatever answer you are holding, set it down."],["34","Nansen said, “Mind is not Buddha. Learning is not the Way.” Put down what you know. Sit with what is left."],["35","Goso asked, “Seijo and her soul were separated. Which is the real one?” Part of you sits here and part of you wanders. Which is you? Let them meet."],["36","Goso said, “When you meet a master on the road, you cannot greet him with words or with silence. How will you greet him?” Meet this moment before choosing either."],["37","A monk asked Joshu, “Why did Bodhidharma come from the west?” Joshu said, “The oak tree in the garden.” Rest your attention on one ordinary thing. Let it be the whole answer."],["38","Goso said, “A buffalo passes through a window. Head, horns and four legs all go through. Why can’t the tail?” What small thing in you has not yet let go? Watch it, gently."],["40","Hyakujo set down a water jar. “Do not call it a water jar. What will you call it?” Isan kicked it over and walked out. Look at one thing near you without its name."],["45","Hoen said, “Even the Buddhas of past and future are his servants. Who is he?” Who is it that all your thoughts report to? Look for that one."],["48","A monk asked, “Where does the one road begin?” Kembo raised his staff, drew a line in the air and said, “Here it is.” Begin here."]],"about":["A koan is a brief exchange or question from the Zen tradition, given to a student to sit with and not to solve by reasoning. The koans here come from The Gateless Gate (Mumonkan in Japanese, Wumenguan in Chinese), forty-eight cases gathered by the Chinese master Wumen Huikai, known in Japan as Mumon, and published in 1228.","Each prompt retells one case briefly, with the Japanese names used in most English editions. The last line of each is ours, added as a way in. It is not part of the case."]},{"key":"jew","name":"Jewish Sources","tag":"","note":"40 prompts, each in our own wording and tagged with its source.","learn":"https://www.sefaria.org/","learnNote":"Opens Sefaria, a free library of Jewish texts in Hebrew and English. Verse numbers here follow the Hebrew Bible; some English Bibles number the Psalms one verse lower.","items":[["Zohar 1:51a","Picture a small flame. At its base, a dark blue light clings to the wick. Above it rests a white light that never changes. See the two as one flame."],["Sefer Yetzirah 1:8","Hold your mouth back from speaking and your heart from thinking. If your heart runs ahead, bring it back to its place. Run, and return."],["Mishnah Berakhot 5:1","The early pious ones waited an hour before praying, only to turn their hearts. Wait one minute now. Do nothing but turn your heart toward the Place."],["Mishneh Torah · Prayer 4:16","Empty your heart of every thought. Picture yourself standing before the Presence. Sit a little like this before you begin, and a little after you end."],["Guide for the Perplexed 3:51","Take one line you know by heart. Say it inwardly with your whole mind on it and nothing else. When the mind strays, begin the line again."],["Tzava’at HaRivash 2","Imagine being praised. Imagine being blamed. Let both weigh the same. Rest in that evenness, where whatever comes is equal."],["Likutei Moharan II:25","Be alone for a while. Say what is in your heart, in your own everyday words, as if to One who listens. If no words come, stay with the wish to speak."],["Likutei Moharan 282","Search yourself for one good point, however small. Then find another. Gather them the way notes are gathered into a melody."],["Bereshit Rabbah 14:9","For every single breath, give praise. Breathe in, and receive it. Breathe out, and give thanks for it."],["Talmud · Berakhot 60b","Breathe in slowly. The morning blessing says: the soul placed in me is pure; it was breathed into me. Feel this breath as given, and as clean."],["Tikkunei Zohar 122b","There is no place empty of the Presence. Rest your attention on your hands, on your breath, on the quiet between sounds. None of it is empty."],["Pirkei Avot 1:14","If not now, when? Leave the past minute and the next one alone. Give yourself entirely to this one."],["Pirkei Avot 1:17","A sage raised among sages found nothing better for a person than silence. Stop the inner talk for one breath. Then one more."],["Pirkei Avot 4:1","Who is rich? The one who is glad of their portion. Look at what is yours right now, a breath, a seat, this hour, and be glad of it."],["Psalm 16:8","Set the Presence before you, always: not as a thought, but as someone in the room. Sit as you would in that company, and be unshaken."],["Psalm 131:2","Still your soul the way a child settles against its mother: fed, wanting nothing. Rest like that."],["Psalm 46:11","Let go. Loosen the hands, the jaw, the next thought. The psalm asks only this: let go, and know."],["Psalm 4:5","Lying down or sitting, speak with your own heart, without sound. Then let even that speaking stop, and be still."],["Psalm 62:6","Say to your own soul: be still. Wait in silence, and let your hope rest in God alone."],["Psalm 23:2","Picture yourself lying down in green pasture, beside waters of rest. Let the water’s stillness become your own."],["Psalm 116:7","Say inwardly: return, my soul, to your rest. Let each out-breath be a step back toward it."],["Psalm 34:9","Taste and see. Take one sensation, the air or a sip of water, and receive it fully, as something good."],["Psalm 36:10","In your light we see light. Close your eyes and notice the light by which you see anything at all. Rest in it."],["Psalm 139:12","Close your eyes. Darkness is not dark to the One who sees; night shines like day. Let the dark behind your eyelids be as safe as light."],["Psalm 118:5","Find the place in you that feels narrow or tight. Breathe toward it. Let it open, slowly, into a wide space."],["Psalm 121:1","Lift your eyes, or your inner gaze, to the far hills. Let your attention rise and widen with them."],["Psalm 8:4","Picture the night sky, the moon and the stars set in their places. Let yourself be small beneath it, and remembered."],["Psalm 27:4","Ask for one thing only. Let every other wish fall quiet. Rest your gaze on that one thing, and dwell there."],["Psalm 19:4","The heavens speak without speech and without words; their voice is not heard. Listen to something that makes no sound."],["I Kings 19:12","Not in the wind, not in the earthquake, not in the fire. After them, a thin silence. Let the noise pass, and listen for what comes after."],["Genesis 28:16","Jacob woke and said: the Presence is in this place, and I did not know it. Look around you, or within. Let this place be that place."],["Exodus 3:5","The ground where you are is holy ground. Feel your feet, or your seat, touching it. Stay exactly here."],["Exodus 24:12","Come up, and be there. Arrive where you already are. For these few minutes, only be there."],["Deuteronomy 6:4","Hear. Before the next word, only listen. Let every sound around you be one sound."],["Isaiah 30:15","In returning and rest, in quiet and trust, is your strength. Return. Rest. Be quiet. Trust."],["Job 37:14","Listen. Stand still. Consider one wonder: that you breathe, that there is light. Stay with it."],["Habakkuk 2:20","Hush. Let all the earth be silent, beginning with you. Sit as if in a sanctuary."],["Ecclesiastes 4:6","Better one handful of quiet than two fists full of toil and chasing wind. Open your hands. Hold one handful of quiet."],["Song of Songs 5:2","I sleep, but my heart is awake. Let the body rest as if asleep. Keep one small light of attention awake in the heart."],["Proverbs 20:27","The breath of a person is a lamp, searching the inner rooms. Follow one breath inward, and let it light what it passes."]],"about":["Jewish contemplative practice is not gathered in one book. It is spread across many texts and many centuries: the Psalms and other books of the Hebrew Bible, the Mishnah and Talmud of the early rabbis, the twelfth-century philosopher Maimonides, the mystical Sefer Yetzirah and Zohar, and the Hasidic masters of eighteenth- and nineteenth-century Eastern Europe, among them the Baal Shem Tov and Rebbe Nachman of Breslov.","Some of these texts describe a practice directly, such as sitting in silence before prayer or speaking to God in one’s own words. Others are verses that the prompts here turn into an exercise in stillness, breath or attention."]}];
+  var PROMPTS = [], BY_ID = {}, SEC_BY_KEY = {};
+  function norm(s) { return s.toLowerCase().replace(/[\u2019']/g, '').replace(/\u2013/g, '-'); }
+  SECTIONS.forEach(function (s) {
+    SEC_BY_KEY[s.key] = s;
+    s.short = s.tag.split('\u00b7 ')[1] || '';
+    s.items.forEach(function (it) {
+      var p = { id: s.key + '-' + it[0], sec: s, ref: it[0], tag: s.tag + it[0], text: it[1] };
+      p.hay = norm(p.tag + ' ' + s.name + ' ' + p.text);
+      PROMPTS.push(p);
+      BY_ID[p.id] = p;
+    });
+  });
+  var LS_PROMPT = 'bst.prompt.v1', LS_FAVS = 'bst.favs.v1';
+  var VERSE_MIN = 14, VERSE_MAX = 32;
+  var current = null, favs = [];
+  try {
+    var rawFavs = JSON.parse(localStorage.getItem(LS_FAVS) || '[]');
+    if (Array.isArray(rawFavs)) favs = rawFavs.filter(function (id) { return typeof id === 'string' && BY_ID[id]; });
+  } catch (e) {}
+
+  function fitVerse() {
+    var box = $('verseBox'), p = $('verse');
+    var room = box.clientHeight;
+    if (!room || !box.clientWidth) return;
+    p.style.fontSize = VERSE_MAX + 'px';
+    if (p.offsetHeight <= room) return;
+    var lo = VERSE_MIN, hi = VERSE_MAX;
+    for (var i = 0; i < 7; i++) {
+      var mid = (lo + hi) / 2;
+      p.style.fontSize = mid + 'px';
+      if (p.offsetHeight <= room) lo = mid; else hi = mid;
+    }
+    p.style.fontSize = (Math.floor(lo * 2) / 2) + 'px';
+  }
+  var BOOKMARK = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h8v13l-4-3-4 3z"></path></svg>';
+  function isFav(id) { return favs.indexOf(id) !== -1; }
+  function paintFavs() {               // every bookmark on the page shows whether its prompt is saved
+    var all = document.querySelectorAll('[data-fav]');
+    for (var i = 0; i < all.length; i++) {
+      var on = isFav(all[i].getAttribute('data-fav'));
+      all[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+      all[i].setAttribute('aria-label', on ? 'Remove from saved prompts' : 'Save this prompt');
+    }
+  }
+  function toggleFav(id) {
+    if (!BY_ID[id]) return;
+    var at = favs.indexOf(id);
+    if (at === -1) favs.unshift(id); else favs.splice(at, 1);
+    try { localStorage.setItem(LS_FAVS, JSON.stringify(favs)); } catch (e) {}
+    paintFavs();
+  }
+  function showPrompt(p) {
+    if (!p) return;
+    current = p;
+    $('verse').textContent = p.text;
+    $('verseTag').textContent = p.tag;
+    $('verseTag').setAttribute('aria-label', p.tag + '. Open ' + p.sec.name);
+    $('favBtn').setAttribute('data-fav', p.id);
+    try { localStorage.setItem(LS_PROMPT, p.id); } catch (e) {}
+    paintFavs();
+    fitVerse();
+  }
+  function pickRandom() {              // any prompt except the one showing now, or the one shown last time
+    var last = current ? current.id : null;
+    if (!last) { try { last = localStorage.getItem(LS_PROMPT); } catch (e) {} }
+    var p;
+    do { p = PROMPTS[Math.floor(Math.random() * PROMPTS.length)]; } while (PROMPTS.length > 1 && p.id === last);
+    return p;
+  }
+  function setVerse() { showPrompt(pickRandom()); }
+  function fillList(ul, list, fullTag) {
+    ul.textContent = '';
+    list.forEach(function (p) {
+      var li = document.createElement('li');
+      var row = document.createElement('button');
+      row.type = 'button';
+      row.className = 'prow' + (current && current.id === p.id ? ' current' : '');
+      row.setAttribute('data-prompt', p.id);
+      var tag = document.createElement('span');
+      tag.className = 'ptag';
+      tag.textContent = fullTag ? p.tag : p.sec.short + p.ref;
+      var text = document.createElement('span');
+      text.className = 'ptext';
+      text.textContent = p.text;
+      row.appendChild(tag);
+      row.appendChild(text);
+      var fav = document.createElement('button');
+      fav.type = 'button';
+      fav.className = 'icon-btn fav';
+      fav.setAttribute('data-fav', p.id);
+      fav.innerHTML = BOOKMARK;
+      li.appendChild(row);
+      li.appendChild(fav);
+      ul.appendChild(li);
+    });
+    paintFavs();
+  }
+  function openSection(key) {
+    var s = SEC_BY_KEY[key];
+    if (!s) return null;
+    $('secTitle').textContent = s.name;
+    var about = $('secAbout');
+    about.textContent = '';
+    (s.about || []).forEach(function (para) {
+      var el = document.createElement('p');
+      el.textContent = para;
+      about.appendChild(el);
+    });
+    $('secNote').textContent = s.note;
+    fillList($('secList'), PROMPTS.filter(function (p) { return p.sec === s; }), false);
+    $('secLearn').setAttribute('href', s.learn);
+    $('secLearn').setAttribute('aria-label', 'Learn more about ' + s.name + ' (opens another page)');
+    $('secLearnNote').textContent = s.learnNote;
+    return showView('section');
+  }
+  function openFavs() {
+    var list = favs.map(function (id) { return BY_ID[id]; }).filter(Boolean);
+    fillList($('favList'), list, true);
+    $('favEmpty').hidden = list.length > 0;
+    return showView('favs');
+  }
+  var SEARCH_MAX = 60;
+  function runSearch() {               // every word typed must appear in the prompt, its source or its tag
+    var q = norm($('searchBox').value).split(/\s+/).filter(Boolean);
+    var on = q.length > 0;
+    $('menuBody').hidden = on;
+    $('searchBody').hidden = !on;
+    if (!on) return;
+    var hits = PROMPTS.filter(function (p) {
+      for (var i = 0; i < q.length; i++) if (p.hay.indexOf(q[i]) === -1) return false;
+      return true;
+    });
+    fillList($('searchList'), hits.slice(0, SEARCH_MAX), true);
+    $('searchCount').textContent = hits.length === 0
+      ? 'No prompt has ' + (q.length > 1 ? 'all of those words' : 'that word') + '. Try one word, such as breath, silence or light.'
+      : (hits.length === 1 ? '1 prompt' : hits.length + ' prompts') + (hits.length > SEARCH_MAX ? ', showing the first ' + SEARCH_MAX : '');
+  }
+  function clearSearch() {
+    $('searchBox').value = '';
+    $('menuBody').hidden = false;
+    $('searchBody').hidden = true;
+  }
+  $('searchBox').addEventListener('input', runSearch);
+  $('shuffleBtn').addEventListener('click', function () { showPrompt(pickRandom()); });
+  $('favBtn').addEventListener('click', function () { if (current) toggleFav(current.id); });
+  $('verseTag').addEventListener('click', function () {
+    if (!current) return;
+    openDrawer('menu');
+    focusFirst(openSection(current.sec.key));
+  });
+
+  /* ---- sizing: the wisp takes the room that is left, then the verse is fitted ---- */
+  function layout() {
+    var area = $('wispArea');
+    var size = clamp(Math.min(area.clientHeight - 66, area.clientWidth - 48), 96, 196);
+    root.style.setProperty('--ws', (size / 196).toFixed(3));
+    fitVerse();
+  }
+  var layoutQueued = false;
+  function queueLayout() {
+    if (layoutQueued) return;
+    layoutQueued = true;
+    requestAnimationFrame(function () { layoutQueued = false; layout(); });
+  }
+  window.addEventListener('resize', queueLayout);
+  window.addEventListener('orientationchange', queueLayout);
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', queueLayout);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(queueLayout).catch(function () {});
+  window.addEventListener('load', queueLayout);
+
+  /* ---- the wisp follows the music: it leans toward the sounding ear and swells with the level ---- */
+  var wisp = $('wisp'), veil = $('veil');
+  var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var level = 0, lastPan = '', lastLevel = '';
+  function wispFrame(pan, rms) {
+    if (still || document.hidden || veil.classList.contains('on')) return;
+    var target = clamp((rms || 0) * 5, 0, 1);
+    level += (target - level) * (target > level ? 0.25 : 0.05);
+    var p = (pan === null || pan === undefined ? 0 : pan).toFixed(2), l = level.toFixed(2);
+    if (p !== lastPan) { wisp.style.setProperty('--pan', p); lastPan = p; }
+    if (l !== lastLevel) { wisp.style.setProperty('--lvl', l); lastLevel = l; }
+  }
+
+  applyLook(false);
+  showPrompt(pickRandom());
+  layout();
+
+  window.__ui = { closeDrawer: closeDrawer, openDrawer: openDrawer, wispFrame: wispFrame, layout: layout, fitVerse: fitVerse, setVerse: setVerse, look: look, promptIds: PROMPTS.map(function (p) { return p.id; }), showPromptById: function (id) { showPrompt(BY_ID[id]); } };
+})();
+</script>
+<script>
+(function () {
+  'use strict';
+
+  var $ = function (id) { return document.getElementById(id); };
+  var clamp = function (v, lo, hi) { return Math.min(hi, Math.max(lo, v)); };
+
+  // The Hop movement (separate notes jumping from ear to ear) is parked, not deleted.
+  // Set this to true and its switch, its saved setting and its sound all come back.
+  var HOP_ENABLED = false;
+
+  /* =====================================================================
+     MELODY — a seed fully determines the tune, so saving a melody means
+     saving one number. Four phrases of eight steps: A, A', B, A''.
+     ===================================================================== */
+  var SCALES = {
+    aeolian: [0, 2, 3, 5, 7, 8, 10],   // natural minor
+    dorian:  [0, 2, 3, 5, 7, 9, 10]    // minor with a brighter sixth
+  };
+  var SCALE_LABEL = { aeolian: 'natural minor', dorian: 'Dorian' };
+  var LO = -3, HI = 9;                 // scale-degree range: a fifth below the tonic to a third above its octave
+  var PHRASE = 8, THEME_STEPS = 32;
+
+  function rngFrom(seed) {             // mulberry32
+    var a = seed >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function pick(rng, table) {
+    var total = 0, i;
+    for (i = 0; i < table.length; i++) total += table[i][1];
+    var r = rng() * total;
+    for (i = 0; i < table.length; i++) { r -= table[i][1]; if (r <= 0) return table[i][0]; }
+    return table[table.length - 1][0];
+  }
+  function mod(a, n) { return ((a % n) + n) % n; }
+  function degreeToSemitones(scale, d) {
+    return 12 * Math.floor(d / 7) + SCALES[scale][mod(d, 7)];
+  }
+
+  function makeRhythm(rng) {           // 1 = a note begins, 0 = the previous note is held
+    var r = [1, 0, 0, 0, 0, 0, 0, 0], i, run = 0, count;
+    for (i = 1; i <= 6; i++) r[i] = rng() < 0.68 ? 1 : 0;
+    for (i = 1; i <= 6; i++) {
+      if (r[i] === 0) { run++; if (run > 2) { r[i] = 1; run = 0; } } else run = 0;
+    }
+    count = r.reduce(function (a, b) { return a + b; }, 0);
+    for (i = 2; count < 4 && i <= 6; i += 2) if (!r[i]) { r[i] = 1; count++; }
+    for (i = 1; count < 4 && i <= 6; i++) if (!r[i]) { r[i] = 1; count++; }
+    return r;
+  }
+  // Mostly stepwise, leaning downward: falling lines read as wistful.
+  var STEP_TABLE = [[-1, 4.5], [1, 3.5], [-2, 1.4], [2, 1.2], [0, 0.5], [-3, 0.4], [3, 0.5], [4, 0.25], [-4, 0.2]];
+  function walk(rng, count, start) {
+    var out = [start], d = start, k;
+    for (k = 1; k < count; k++) {
+      var table = STEP_TABLE.map(function (e) {
+        var w = e[1];
+        if (d >= 6 && e[0] > 0) w *= 0.3;
+        if (d <= 0 && e[0] < 0) w *= 0.3;
+        return [e[0], w];
+      });
+      d = clamp(d + pick(rng, table), LO, HI);
+      out.push(d);
+    }
+    return out;
+  }
+  function nearestOctave(target, ref) {
+    var best = null;
+    [target - 7, target, target + 7].forEach(function (c) {
+      if (c < LO || c > HI) return;
+      if (best === null || Math.abs(c - ref) < Math.abs(best - ref)) best = c;
+    });
+    return best === null ? clamp(target, LO, HI) : best;
+  }
+  function cadence(rng, degs, target) { // land the phrase on `target`, approached by step
+    var n = degs.length;
+    var ref = n >= 3 ? degs[n - 3] : degs[n - 2];
+    var end = nearestOctave(target, ref);
+    degs[n - 1] = end;
+    if (n >= 3 && (Math.abs(degs[n - 2] - end) > 2 || degs[n - 2] === end)) {
+      var appr = end + (rng() < 0.65 ? 1 : -1);
+      if (appr > HI) appr = end - 1;
+      if (appr < LO) appr = end + 1;
+      degs[n - 2] = appr;
+    }
+    return degs;
+  }
+  function countOnsets(r) { return r.reduce(function (a, b) { return a + b; }, 0); }
+
+  function makeTheme(seed) {
+    var rng = rngFrom(seed);
+    var scale = rng() < 0.6 ? 'aeolian' : 'dorian';
+    var rhA = makeRhythm(rng), rhB = makeRhythm(rng);
+    var startA = pick(rng, [[4, 4], [2, 3], [7, 2], [0, 1]]);
+    var baseA = walk(rng, countOnsets(rhA), startA);
+    var A  = cadence(rng, baseA.slice(), pick(rng, [[4, 3], [1, 2], [2, 2]]));   // ends open: fifth, second or third
+    var A2 = cadence(rng, baseA.slice(), pick(rng, [[2, 2], [0, 2], [6, 1.5]]));
+    var startB = clamp(startA + pick(rng, [[2, 2], [3, 2], [4, 1]]), LO, HI - 1); // the answer starts higher
+    var B  = cadence(rng, walk(rng, countOnsets(rhB), startB), pick(rng, [[4, 3], [1, 2], [6, 1]]));
+    var A3 = cadence(rng, baseA.slice(), 0);                                      // comes home to the tonic
+    return { scale: scale, rhythms: [rhA, rhA, rhB, rhA], degs: [A, A2, B, A3] };
+  }
+
+  // One pass through the theme. Pass 0 is the theme itself; later passes are small
+  // variations of it (never of each other), so it stays recognisable and reproducible.
+  function cycleSteps(theme, seed, cycle) {
+    var rng = rngFrom((seed ^ Math.imul(cycle + 1, 0x9E3779B1)) >>> 0);
+    var out = [], p, s;
+    for (p = 0; p < 4; p++) {
+      var rh = theme.rhythms[p], dg = theme.degs[p].slice();
+      if (cycle > 0 && dg.length > 3 && rng() < 0.6) {
+        var i = 1 + Math.floor(rng() * (dg.length - 3));
+        dg[i] = clamp(dg[i] + (rng() < 0.5 ? -1 : 1), LO, HI);
+      }
+      var steps = [], k = 0;
+      for (s = 0; s < PHRASE; s++) steps.push(rh[s] ? dg[k++] : null);
+      if (cycle > 0 && rng() < 0.35) {          // let one held step become a passing tone
+        var holds = [];
+        for (s = 1; s <= 5; s++) if (steps[s] === null && steps[s + 1] !== null) holds.push(s);
+        if (holds.length) {
+          var h = holds[Math.floor(rng() * holds.length)], prev = null, q;
+          for (q = h - 1; q >= 0; q--) if (steps[q] !== null) { prev = steps[q]; break; }
+          var next = steps[h + 1], dir = next > prev ? 1 : next < prev ? -1 : (rng() < 0.5 ? 1 : -1);
+          steps[h] = clamp(prev + dir, LO, HI);
+        }
+      }
+      for (s = 0; s < PHRASE; s++) out.push(steps[s]);
+    }
+    return out;
+  }
+
+  // Quicker notes between two steps: a passing tone on the half step, at most two a phrase.
+  function decorate(steps, seed, cycle) {
+    var rng = rngFrom((seed ^ 0x27D4EB2F ^ Math.imul(cycle + 7, 0x165667B1)) >>> 0);
+    var halves = [], p, s;
+    for (p = 0; p < 4; p++) {
+      var used = 0;
+      for (s = 0; s < PHRASE; s++) {
+        var i = p * PHRASE + s, h = null;
+        if (s < PHRASE - 1 && steps[i] !== null && steps[i + 1] !== null && used < 2 && rng() < (cycle === 0 ? 0.22 : 0.32)) {
+          var d = steps[i + 1] - steps[i];
+          if (Math.abs(d) >= 2) h = steps[i] + (d > 0 ? 1 : -1);
+          else if (d === 0) h = clamp(steps[i] + (rng() < 0.5 ? 1 : -1), LO, HI);
+          if (h !== null) used++;
+        }
+        halves.push(h);
+      }
+    }
+    return halves;
+  }
+
+  /* =====================================================================
+     HARMONY AND ARRANGEMENT — the tune is harmonised after the fact: for
+     every stretch of the melody the chord that fits its notes best is
+     chosen, with a preference for progressions that move.
+     ===================================================================== */
+  var ENSEMBLES = [
+    { id: 'strings', label: 'String ensemble',   lead: 'bowed', shift: 0,  fill: null,    span: 4, weight: 50 },
+    { id: 'piano',   label: 'Piano and strings', lead: 'piano', shift: 0,  fill: 'piano', span: 4, weight: 30 },
+    { id: 'glass',   label: 'Glass and strings', lead: 'glass', shift: 12, fill: 'glass', span: 8, weight: 20 }
+  ];
+  function ensembleById(id) {
+    for (var i = 0; i < ENSEMBLES.length; i++) if (ENSEMBLES[i].id === id) return ENSEMBLES[i];
+    return null;
+  }
+  // Pieces saved before the ensembles were re-weighted keep the instrument they were saved with.
+  function pickEnsemble(seed, legacy) {
+    var table = legacy ? [['piano', 45], ['strings', 30], ['glass', 25]]
+                       : ENSEMBLES.map(function (e) { return [e.id, e.weight]; });
+    return ensembleById(pick(rngFrom((seed ^ 0x85EBCA6B) >>> 0), table));
+  }
+  // The soundscape around the tune: every piece gets its own hall, its own string colour, its own air.
+  function makeScene(seed, ens) {
+    var r = rngFrom((seed ^ 0x9B5D3A17) >>> 0);
+    var sc = {
+      cutoff: 950 + r() * 500,           // how bright the string section is
+      chorus: 0.0018 + r() * 0.0014,     // how much the section shimmers
+      hall: 4.8 + r() * 1.8,             // how long the room rings, in seconds
+      wet: 0.42 + r() * 0.12,            // how far back in the room the music sits
+      halo: r() < 0.7, air: r() < 0.5,   // high pure tones above the chords; a breath of noise beneath them
+      majorV: r() < 0.7,                 // whether the dominant chord may turn major
+      warm: r() < 0.4,                   // a rounder, flutier section
+      center: 2 + Math.floor(r() * 4)    // where the section's chords sit
+    };
+    if (!sc.halo && !sc.air) sc.halo = true;
+    if (ens.id === 'glass') { sc.warm = true; sc.cutoff *= 0.85; }
+    return sc;
+  }
+  var ROMAN = ['i', 'ii', 'III', 'iv', 'v', 'VI', 'VII'];
+
+  function chordInfo(scale, r) {
+    var s0 = degreeToSemitones(scale, r);
+    var third = degreeToSemitones(scale, r + 2) - s0, fifth = degreeToSemitones(scale, r + 4) - s0, sev = degreeToSemitones(scale, r + 6) - s0;
+    return {
+      r: r, pc: mod(s0, 12), third: third, sev: sev, ok: fifth === 7,
+      // a seventh is added only where it sweetens: minor seventh on minor chords, major seventh on major ones
+      seventh: (third === 3 && sev === 10) || (third === 4 && sev === 11),
+      ninth: mod(degreeToSemitones(scale, r + 1) - s0, 12) === 2,
+      raised: false,
+      name: third === 4 ? ROMAN[r].toUpperCase() : ROMAN[r].toLowerCase()
+    };
+  }
+  function majorDominant(c) {          // the minor dominant with its third raised: the classic pull back home
+    return { r: c.r, pc: c.pc, third: 4, sev: c.sev, ok: true, seventh: false, ninth: c.ninth, raised: true, name: 'V' };
+  }
+  function harmonize(theme, seed, span) {
+    var steps = cycleSteps(theme, seed, 0), slots = THEME_STEPS / span;
+    var rng = rngFrom((seed ^ 0xC2B2AE35) >>> 0);
+    var cands = [], r, s, k, i, j;
+    for (r = 0; r < 7; r++) { var info = chordInfo(theme.scale, r); if (info.ok) cands.push(info); }
+    var w = [], cur = steps[0];
+    for (s = 0; s < slots; s++) w.push([0, 0, 0, 0, 0, 0, 0]);
+    for (i = 0; i < THEME_STEPS; i++) {
+      if (steps[i] !== null) cur = steps[i];
+      w[Math.floor(i / span)][mod(cur, 7)] += (i % span === 0 ? 1.5 : 1) * (steps[i] !== null ? 1.2 : 0.8);
+    }
+    var REL = [1, 0.15, 1, -0.7, 0.9, -0.45];   // how well a melody note sits on a chord: root, ninth, third, fourth, fifth, sixth
+    function fit(c, slot) {
+      var sum = 0;
+      for (var d = 0; d < 7; d++) {
+        var rel = mod(d - c.r, 7);
+        sum += w[slot][d] * (rel === 6 ? (c.seventh ? 0.4 : -0.3) : REL[rel]);
+      }
+      return sum;
+    }
+    function move(a, b) {
+      if (a.r === b.r) return -1.4;
+      var d = mod(b.r - a.r, 7);
+      return d === 3 ? 0.5 : d === 5 ? 0.4 : d === 4 ? 0.3 : (d === 1 || d === 6) ? 0.25 : 0.1;
+    }
+    var best = [], back = [];
+    for (s = 0; s < slots; s++) {
+      best.push([]); back.push([]);
+      for (k = 0; k < cands.length; k++) {
+        var c = cands[k], sc = fit(c, s) + (rng() * 0.6 - 0.3) + (s === 0 && c.r === 0 ? 1.5 : 0);
+        if (s === slots - 1 && c.r !== 0) sc = -1e9;          // the theme ends at home
+        if (s === 0) { best[s][k] = sc; back[s][k] = -1; continue; }
+        var bv = -Infinity, bi = 0;
+        for (j = 0; j < cands.length; j++) {
+          var x = best[s - 1][j] + move(cands[j], c);
+          if (x > bv) { bv = x; bi = j; }
+        }
+        best[s][k] = sc + bv; back[s][k] = bi;
+      }
+    }
+    var out = [], kk = 0, top = -Infinity;
+    for (k = 0; k < cands.length; k++) if (best[slots - 1][k] > top) { top = best[slots - 1][k]; kk = k; }
+    for (s = slots - 1; s >= 0; s--) { out[s] = cands[kk]; kk = back[s][kk]; }
+    return out;
+  }
+
+  var ADJ = ['Quiet', 'Grey', 'Low', 'Slow', 'Pale', 'Distant', 'Still', 'Late', 'Soft', 'Blue', 'Dim', 'Bare',
+             'Long', 'Faint', 'Amber', 'Tender', 'Silver', 'Early', 'Gentle', 'Thin', 'Small', 'Far', 'Open', 'North'];
+  var NOUN = ['Rain', 'Harbor', 'Window', 'Field', 'Lantern', 'River', 'Winter', 'Hour', 'Shore', 'Station', 'Orchard', 'Stairwell',
+              'Dusk', 'Snow', 'Ferry', 'Attic', 'Platform', 'Meadow', 'Corridor', 'Lake', 'Rooftop', 'Letter', 'Tide', 'Garden'];
+  function nameFor(seed) {
+    var r = rngFrom((seed ^ 0x5F3759DF) >>> 0);
+    return ADJ[Math.floor(r() * ADJ.length)] + ' ' + NOUN[Math.floor(r() * NOUN.length)];
+  }
+  function seedId(seed) { return 'm-' + ('0000000' + (seed >>> 0).toString(16)).slice(-8); }
+  function freshSeed() {
+    try { var a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] >>> 0; }
+    catch (e) { return Math.floor(Math.random() * 4294967296) >>> 0; }
+  }
+  var melodyCache = {};
+  function makeMelody(seed, ensId) {
+    seed = seed >>> 0;
+    var ens = (ensId && ensembleById(ensId)) || pickEnsemble(seed, false);
+    var key = seed + ':' + ens.id;
+    if (melodyCache[key]) return melodyCache[key];
+    var theme = makeTheme(seed), scene = makeScene(seed, ens), chords = harmonize(theme, seed, ens.span);
+    var m = {
+      seed: seed, id: seedId(seed), name: nameFor(seed), theme: theme, scale: theme.scale,
+      ensemble: ens, scene: scene, chords: chords,
+      raised: chords.map(function (c) { return (scene.majorV && c.r === 4 && c.third === 3) ? majorDominant(c) : null; })
+    };
+    melodyCache[key] = m;
+    return m;
+  }
+
+  /* =====================================================================
+     SETTINGS
+     ===================================================================== */
+  var KEYS = ['A', 'B♭', 'B', 'C', 'C♯', 'D', 'E♭', 'E', 'F', 'F♯', 'G', 'A♭'];
+  var SLOW = 4.0, FAST = 0.6;          // seconds for one pass from ear to ear
+  var settings = { mode: 'glide', speedT: 1.5, pitch: 0, vol: 70, screen: 'dark' };
+
+  function sliderToT(v) { return Math.round(SLOW * Math.pow(FAST / SLOW, v / 100) * 100) / 100; }
+  function tToSlider(T) { return Math.round(100 * Math.log(T / SLOW) / Math.log(FAST / SLOW)); }
+  function tonicHz() { return 220 * Math.pow(2, settings.pitch / 12); }
+  function keyName(pitch) { return KEYS[mod(pitch, 12)]; }
+  function volGain() { var v = settings.vol / 100; return v * v * 0.8; }
+
+  var LS_SETTINGS = 'bst.settings.v1', LS_SAVED = 'bst.saved.v1';
+  function loadSettings() {
+    try {
+      var s = JSON.parse(localStorage.getItem(LS_SETTINGS) || 'null');
+      if (!s) return;
+      if (HOP_ENABLED && s.mode === 'hop') settings.mode = 'hop';
+      if (typeof s.speedT === 'number') settings.speedT = clamp(s.speedT, FAST, SLOW);
+      if (typeof s.pitch === 'number') settings.pitch = clamp(Math.round(s.pitch), -5, 5);
+      if (typeof s.vol === 'number') settings.vol = clamp(Math.round(s.vol), 0, 100);
+      if (s.screen === 'dark' || s.screen === 'sleep') settings.screen = s.screen;
+    } catch (e) {}
+  }
+  function storeSettings() { try { localStorage.setItem(LS_SETTINGS, JSON.stringify(settings)); } catch (e) {} }
+
+  /* =====================================================================
+     SOUND ENGINE — everything is synthesised; there are no recordings.
+     The bed is a string section (through an ensemble effect), low strings,
+     a halo of high tones and a breath of air, in a long dark hall. Over it:
+     the lead, a second voice, an octave doubling and a high counter-line
+     that enter and leave as the piece builds and recedes.
+     ===================================================================== */
+  var BED_WIDTH = 0.9, INTRO_STEPS = 8;
+  var MIX = { piano: 0.4, pianoFill: 0.14, bowed: 0.22, second: 0.065, octave: 0.038, glass: 0.24, glassFill: 0.125,
+              padNote: 0.085, low: 0.066, bass: 0.043, counter: 0.03, halo: 0.015, air: 0.042, hop: 0.3 };
+  // How a piece builds and recedes: one entry per pass through the theme, then round again.
+  var STAGES = [
+    { level: 0.78, second: false, octave: false, counter: false, rest: false },   // the tune alone over the bed
+    { level: 0.9,  second: true,  octave: false, counter: true,  rest: false },   // a second voice and a high line join
+    { level: 1,    second: true,  octave: true,  counter: true,  rest: false },   // fullest: the tune doubled an octave away
+    { level: 0.72, second: false, octave: false, counter: true,  rest: true }     // the lead sits out half a pass, then returns quietly
+  ];
+
+  function createEngine(ac) {
+    var master = ac.createGain();
+    master.gain.value = volGain();
+    master.connect(ac.destination);
+    var meter = null, meterBuf = null;        // listens to the mix so the wisp can swell with it
+    try { meter = ac.createAnalyser(); meter.fftSize = 256; meterBuf = new Uint8Array(256); master.connect(meter); } catch (e) { meter = null; }
+    function level() {
+      if (!meter) return 0;
+      meter.getByteTimeDomainData(meterBuf);
+      var sum = 0;
+      for (var i = 0; i < 256; i++) { var x = (meterBuf[i] - 128) / 128; sum += x * x; }
+      return Math.sqrt(sum / 256);
+    }
+    var tone = ac.createBiquadFilter();           // rounds off the top so nothing sounds glassy
+    tone.type = 'lowpass'; tone.frequency.value = 3600; tone.Q.value = 0.4;
+    tone.connect(master);
+    var verbIn = ac.createBiquadFilter();         // the hall hears a slightly darker signal
+    verbIn.type = 'lowpass'; verbIn.frequency.value = 3000; verbIn.Q.value = 0.3;
+    var verb = ac.createConvolver(), wet = ac.createGain(), hallLength = 0;
+    wet.gain.value = 0.45;
+    verbIn.connect(verb); verb.connect(wet); wet.connect(master);
+
+    var pianoWave = (function () {                // a soft struck-string spectrum
+      var n = 14, re = new Float32Array(n + 1), im = new Float32Array(n + 1);
+      for (var k = 1; k <= n; k++) im[k] = 1 / Math.pow(k, 1.5);
+      return ac.createPeriodicWave(re, im);
+    })();
+    var noise = (function () {                    // three seconds of hiss, looped and filtered into "air"
+      var len = Math.floor(ac.sampleRate * 3), b = ac.createBuffer(1, len, ac.sampleRate), d = b.getChannelData(0);
+      for (var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+      return b;
+    })();
+
+    var S = null;
+
+    // A long, dark hall, built fresh for each piece: the bright part of the echo dies quickly,
+    // the dark part lingers. Two channels, so left stays left and right stays right.
+    function makeImpulse(seconds) {
+      var rate = ac.sampleRate, len = Math.floor(rate * seconds), pre = Math.floor(rate * 0.022);
+      var buf = ac.createBuffer(2, len, rate);
+      var kBright = Math.exp(-6.9 / (rate * seconds * 0.45)), kDark = Math.exp(-6.9 / (rate * seconds));
+      for (var ch = 0; ch < 2; ch++) {
+        var d = buf.getChannelData(ch), lpB = 0, lpD = 0, eB = 1, eD = 1;
+        for (var i = pre; i < len; i++) {
+          var n = Math.random() * 2 - 1;
+          lpB += (n - lpB) * 0.45; lpD += (n - lpD) * 0.09;
+          d[i] = lpB * eB * 0.5 + lpD * eD * 1.6;
+          eB *= kBright; eD *= kDark;
+        }
+      }
+      return buf;
+    }
+    function setHall(seconds, level) {
+      if (Math.abs(seconds - hallLength) > 0.05) {
+        try { verb.buffer = makeImpulse(seconds); hallLength = seconds; } catch (e) {}
+      }
+      wet.gain.value = level;
+    }
+    function hz(semis) { return tonicHz() * Math.pow(2, semis / 12); }
+    function place(semis, lo, hi) { while (semis > hi) semis -= 12; while (semis < lo) semis += 12; return semis; }
+    function lowpass(freq, q) {
+      var f = ac.createBiquadFilter();
+      f.type = 'lowpass'; f.frequency.value = freq; f.Q.value = q;
+      return f;
+    }
+    function gain(dest, value) {
+      var n = ac.createGain();
+      if (value !== undefined) n.gain.value = value;
+      if (dest) n.connect(dest);
+      return n;
+    }
+
+    // The string-section effect: three copies of the sound, each drifting slightly in pitch,
+    // so a handful of oscillators reads as a roomful of players.
+    function makeChorus(t0, depth) {
+      var input = ac.createGain(), out = ac.createGain(), lfos = [], amounts = [];
+      input.connect(gain(out, 0.55));
+      [[0.0113, 0.31], [0.0171, 0.43], [0.0233, 0.57]].forEach(function (d) {
+        var line = ac.createDelay(0.1), lfo = ac.createOscillator(), amount = gain(line.delayTime, depth);
+        line.delayTime.value = d[0];
+        lfo.frequency.value = d[1];
+        lfo.connect(amount); lfo.start(t0);
+        input.connect(line); line.connect(gain(out, 0.42));
+        lfos.push(lfo); amounts.push(amount);
+      });
+      return {
+        input: input, out: out, lfos: lfos,
+        setDepth: function (d, when) { amounts.forEach(function (a) { a.gain.setTargetAtTime(d, when, 1); }); }
+      };
+    }
+
+    /* ---- one voice: a few oscillators, optionally through its own filter, into an envelope ---- */
+    function voice(t, semis, parts, dest, filtered) {
+      var env = ac.createGain();
+      env.gain.setValueAtTime(0, t);
+      var head = env, filter = null;
+      if (filtered) {
+        filter = lowpass(2000, 0.5);
+        filter.connect(env); head = filter;
+      }
+      var f = hz(semis), mults = [];
+      var oscs = parts.map(function (p) {
+        var o = ac.createOscillator(), g = ac.createGain(), mult = p.mult || 1;
+        if (p.wave) o.setPeriodicWave(p.wave); else o.type = p.type;
+        o.frequency.setValueAtTime(f * mult, t);
+        if (p.cents) o.detune.setValueAtTime(p.cents, t);
+        g.gain.value = p.gain;
+        o.connect(g); g.connect(head); o.start(t);
+        mults.push(mult);
+        return o;
+      });
+      env.connect(dest);
+      var v = { env: env, filter: filter, oscs: oscs, mults: mults, semis: semis, extra: [], lfo: null }, home = S;
+      if (home) home.voices.add(v);
+      oscs[0].onended = function () {
+        try { env.disconnect(); v.extra.forEach(function (n) { n.disconnect(); }); } catch (e) {}
+        if (home) home.voices.delete(v);
+      };
+      return v;
+    }
+    function stopAt(v, when) {
+      v.oscs.forEach(function (o) { try { o.stop(when); } catch (e) {} });
+      if (v.lfo) { try { v.lfo.stop(when); } catch (e) {} }
+    }
+
+    /* ---- instruments ---- */
+    function pianoNote(t, semis, vel, level, dest) {        // soft felt piano: bright at the strike, mellow as it rings
+      var f = hz(semis);
+      var v = voice(t, semis, [{ wave: pianoWave, cents: -1.5, gain: 0.75 }, { wave: pianoWave, cents: 2.5, gain: 0.25 }], dest, true);
+      v.filter.frequency.setValueAtTime(clamp(f * (3 + 5 * vel), 700, 5200), t);
+      v.filter.frequency.setTargetAtTime(clamp(f * 1.7, 320, 1500), t + 0.01, 0.4);
+      var peak = level * vel;
+      v.env.gain.linearRampToValueAtTime(peak, t + 0.006);
+      v.env.gain.setTargetAtTime(peak * 0.4, t + 0.006, 0.22);
+      v.env.gain.setTargetAtTime(0, t + 0.8, 1.3);
+      stopAt(v, t + 5.6);
+    }
+    function glassNote(t, semis, vel, level, dest, tau, extra) {   // a bell-like tone with a long, clean decay
+      var v = voice(t, semis, [{ type: 'sine', gain: 1 }, { type: 'triangle', cents: 6, gain: 0.3 },
+                               { type: 'sine', mult: 2, gain: 0.12 }], dest, false);
+      if (extra) v.extra.push(extra);
+      var peak = level * vel;
+      v.env.gain.linearRampToValueAtTime(peak, t + 0.014);
+      v.env.gain.setTargetAtTime(0, t + 0.014, tau);
+      stopAt(v, t + 0.014 + tau * 7);
+    }
+    function makeBowed(t, dest, level, cutoff, rate) {      // one sustained, singing string line with vibrato
+      var v = voice(t, 0, [{ type: 'sawtooth', cents: -5, gain: 0.5 }, { type: 'sawtooth', cents: 6, gain: 0.5 },
+                           { type: 'sine', gain: 0.7 }], dest, true);
+      v.filter.frequency.value = cutoff; v.filter.Q.value = 0.8;
+      var lfo = ac.createOscillator(), depth = ac.createGain();
+      lfo.frequency.value = rate; depth.gain.value = 0;
+      lfo.connect(depth);
+      v.oscs.forEach(function (o) { depth.connect(o.detune); });
+      lfo.start(t); v.lfo = lfo; v.extra.push(depth);
+      v.sounding = false; v.peak = 0;
+      v.noteOn = function (when, semis, vel) {
+        var f = hz(semis), peak = level * vel;
+        v.semis = semis;
+        if (!v.sounding) {                                  // from silence: a slow bow
+          v.oscs.forEach(function (o, i) { o.frequency.setValueAtTime(f * v.mults[i], when); });
+          v.env.gain.setTargetAtTime(peak, when, 0.24);
+        } else {                                            // slide into the new note, with a small bow change
+          v.oscs.forEach(function (o, i) { o.frequency.setTargetAtTime(f * v.mults[i], when, 0.035); });
+          v.env.gain.setTargetAtTime(peak * 0.62, when - 0.05, 0.02);
+          v.env.gain.setTargetAtTime(peak, when, 0.13);
+        }
+        v.env.gain.setTargetAtTime(peak * 0.72, when + 0.6, 1.6);
+        depth.gain.setValueAtTime(1, when);
+        depth.gain.linearRampToValueAtTime(10, when + 0.9); // vibrato blooms after the note settles
+        v.sounding = true; v.peak = peak;
+      };
+      v.ease = function (when, frac, tau) { if (v.sounding) v.env.gain.setTargetAtTime(v.peak * frac, when, tau); };
+      v.rest = function (when, tau) { v.env.gain.setTargetAtTime(0, when, tau || 0.4); v.sounding = false; };
+      return v;
+    }
+    function bowedTo(name, t, semis, vel, dest, level, cutoff, rate) {
+      if (!S[name]) S[name] = makeBowed(t, dest, level, cutoff, rate);
+      S[name].noteOn(t, semis, vel);
+    }
+
+    /* ---- the bed ---- */
+    function swapNotes(map, want, t, make, tau) {  // notes shared with the last chord simply carry on
+      Object.keys(map).forEach(function (key) {
+        if (want[key]) return;
+        map[key].env.gain.setTargetAtTime(0, t, tau);
+        stopAt(map[key], t + tau * 6);
+        delete map[key];
+      });
+      Object.keys(want).forEach(function (key) { if (!map[key]) map[key] = make(+key); });
+    }
+    function setChord(t, chord, dur) {
+      var sc = S.m.scene;
+      // the string section: chord tones gathered around the middle
+      var want = {};
+      [0, chord.third, 7].concat(chord.seventh ? [chord.sev] : []).forEach(function (iv) {
+        want[place(chord.pc + iv, sc.center - 6, sc.center + 5)] = true;
+      });
+      swapNotes(S.pad, want, t, function (semis) {
+        var v = voice(t, semis, [{ type: 'sawtooth', cents: -7, gain: 0.55 },
+                                 { type: sc.warm ? 'triangle' : 'sawtooth', cents: 6, gain: sc.warm ? 0.5 : 0.45 }], S.padIn, false);
+        v.env.gain.setTargetAtTime(MIX.padNote, t, 0.9);
+        return v;
+      }, 1.1);
+      // a halo: two high, pure tones that hang above the chord
+      if (sc.halo) {
+        var high = {};
+        high[place(chord.pc + 7, 19, 30)] = true;
+        high[place(chord.pc + (chord.ninth ? 2 : 0), 19, 30)] = true;
+        swapNotes(S.halo, high, t, function (semis) {
+          var v = voice(t, semis, [{ type: 'sine', gain: 1 }, { type: 'sine', cents: 5, gain: 0.6 }], S.haloIn, false);
+          v.env.gain.setTargetAtTime(MIX.halo, t, 2.2);
+          return v;
+        }, 2.4);
+      }
+      // low strings: the root, and the fifth above it for weight
+      var root = place(chord.pc, -19, -8);
+      if (!S.bass || S.bass.semis !== root) {
+        if (S.bass) { S.bass.env.gain.setTargetAtTime(0, t, 0.7); stopAt(S.bass, t + 5); }
+        if (S.low5) { S.low5.env.gain.setTargetAtTime(0, t, 0.9); stopAt(S.low5, t + 6); }
+        S.bass = voice(t, root, [{ type: 'sawtooth', gain: 0.4 }, { type: 'sine', gain: 1 }], S.bassIn, false);
+        S.bass.env.gain.setTargetAtTime(MIX.bass, t, 0.4);
+        S.low5 = voice(t, root + 7, [{ type: 'sawtooth', cents: -6, gain: 0.55 }, { type: 'sawtooth', cents: 5, gain: 0.45 }], S.lowIn, false);
+        S.low5.env.gain.setTargetAtTime(MIX.low, t, 0.7);
+      }
+      // each chord is one long bow stroke: it swells, then relaxes
+      S.padSwell.gain.setTargetAtTime(1, t, Math.max(0.3, dur * 0.22));
+      S.padSwell.gain.setTargetAtTime(0.8, t + dur * 0.55, Math.max(0.3, dur * 0.3));
+      S.chord = chord;
+    }
+    function fillTone(chord, k) {                 // a broken chord under the tune: root, fifth, tenth, fifth
+      var root = place(chord.pc, -12, -1);
+      return root + [0, 7, 12 + chord.third, 7][k % 4];
+    }
+    function counterNote(t, chord) {              // a slow upper line that moves to the nearest chord tone
+      var ref = S.counterSemis === null ? 9 : S.counterSemis, best = null;
+      [chord.third, 7].concat(chord.seventh ? [chord.sev] : []).forEach(function (iv) {
+        [-12, 0, 12, 24].forEach(function (oct) {
+          var y = chord.pc + iv + oct;
+          if (y < 4 || y > 16) return;
+          if (best === null || Math.abs(y - ref) < Math.abs(best - ref)) best = y;
+        });
+      });
+      if (best === null) return;
+      if (best !== S.counterSemis || !S.counter || !S.counter.sounding) {
+        bowedTo('counter', t, best, 1, S.sectionIn, MIX.counter, 1800, 4.8);
+      }
+      S.counterSemis = best;
+    }
+    function lowSevenths(steps, halves, span) {   // which stretches of the tune sound the lowered seventh
+      var has = [], cur = null;
+      for (var i = 0; i < THEME_STEPS; i++) {
+        var slot = Math.floor(i / span);
+        if (steps[i] !== null) cur = steps[i];
+        if ((cur !== null && mod(cur, 7) === 6) || (halves[i] !== null && mod(halves[i], 7) === 6)) has[slot] = true;
+      }
+      return has;
+    }
+
+    /* ---- session ---- */
+    function begin(m, t0) {
+      end();
+      var sc = m.scene;
+      setHall(sc.hall, sc.wet);
+      var leadBus = gain(tone), bedBus = gain(tone);
+      leadBus.connect(gain(verbIn, 0.7)); bedBus.connect(gain(verbIn, 1));   // the bed sits deeper in the hall
+      var leadPan = ac.createStereoPanner(), bedPan = ac.createStereoPanner();
+      leadPan.connect(leadBus); bedPan.connect(bedBus);
+
+      var chorus = makeChorus(t0, sc.chorus);
+      var bedLevel = gain(bedPan, 0.8 + 0.2 * STAGES[0].level);
+      chorus.out.connect(bedLevel);
+      var padGain = gain(chorus.input), padSwell = gain(padGain, 0.85), padFilter = lowpass(sc.cutoff, 0.5);
+      padFilter.connect(padSwell);
+      var lowGain = gain(chorus.input), lowFilter = lowpass(520, 0.5);
+      lowFilter.connect(lowGain);
+      var sectionIn = gain(chorus.input), haloIn = gain(chorus.input);
+      var bassOut = gain(bedPan), bassFilter = lowpass(380, 0.6);
+      bassFilter.connect(bassOut);
+
+      var breath = ac.createOscillator(), breathDepth = gain(padFilter.frequency, sc.cutoff * 0.2);   // the section slowly opens and closes
+      breath.frequency.value = 0.05; breath.connect(breathDepth); breath.start(t0);
+
+      var airOut = gain(bedPan), airLevel = gain(airOut, 0);                 // air: a very quiet, slowly drifting breath of noise
+      var air = ac.createBufferSource(), airBand = ac.createBiquadFilter(), airTop = lowpass(1300, 0.5);
+      air.buffer = noise; air.loop = true;
+      airBand.type = 'bandpass'; airBand.frequency.value = 650; airBand.Q.value = 0.5;
+      air.connect(airBand); airBand.connect(airTop); airTop.connect(airLevel); air.start(t0);
+      airLevel.gain.setTargetAtTime(sc.air ? MIX.air : 0, t0, 3);
+      var airDrift = ac.createOscillator();
+      airDrift.frequency.value = 0.037; airDrift.connect(gain(airBand.frequency, 250)); airDrift.start(t0);
+
+      S = {
+        m: m, leadBus: leadBus, bedBus: bedBus, leadPan: leadPan, bedPan: bedPan,
+        leadIn: gain(leadPan), fillIn: gain(leadPan), hopIn: gain(leadBus),
+        padIn: padFilter, padSwell: padSwell, lowIn: lowFilter, sectionIn: sectionIn, haloIn: haloIn, bassIn: bassFilter,
+        bedLevel: bedLevel, chorus: chorus, breathDepth: breathDepth, airLevel: airLevel,
+        sources: [breath, air, airDrift].concat(chorus.lfos),
+        voices: new Set(), pad: {}, halo: {}, bass: null, low5: null,
+        lead: null, second: null, octave: null, counter: null, counterSemis: null, chord: null, has7: [],
+        n: 0,                // steps since the session began: decides which ear a step starts in
+        pos: 0,              // steps into the current melody
+        intro: INTRO_STEPS, cycle: -1, steps: null, halves: null, lastDeg: null,
+        nextTime: t0, anchor: true, marks: [], began: (window.performance ? performance.now() : 0)
+      };
+      S.layers = { lead: S.leadIn, fill: S.fillIn, pad: padGain, low: lowGain, section: sectionIn, halo: haloIn,
+                   bass: bassOut, air: airOut, hop: S.hopIn };
+    }
+    function end() {
+      if (!S) return;
+      var s = S, now = ac.currentTime;
+      S = null;
+      s.leadBus.gain.setTargetAtTime(0, now, 0.15);
+      s.bedBus.gain.setTargetAtTime(0, now, 0.15);
+      setTimeout(function () {
+        s.voices.forEach(function (v) { stopAt(v, 0); });
+        s.sources.forEach(function (o) { try { o.stop(); } catch (e) {} });
+        try { s.leadPan.disconnect(); s.bedPan.disconnect(); s.hopIn.disconnect(); s.leadBus.disconnect(); s.bedBus.disconnect(); } catch (e) {}
+      }, 1200);
+    }
+    function switchMelody(m) {           // keep the session and the left-right rhythm, change the music
+      if (!S) return;
+      var t = Math.max(ac.currentTime, S.nextTime), sc = m.scene;
+      S.m = m; S.pos = 0; S.cycle = -1; S.steps = null; S.halves = null; S.lastDeg = null;
+      S.intro = 4;
+      ['lead', 'second', 'octave', 'counter'].forEach(function (name) { if (S[name] && S[name].sounding) S[name].rest(t, 0.8); });
+      S.counterSemis = null;
+      // the room and the colour of the section drift over to the new piece's
+      S.padIn.frequency.setTargetAtTime(sc.cutoff, t, 1.5);
+      S.breathDepth.gain.setTargetAtTime(sc.cutoff * 0.2, t, 1.5);
+      S.chorus.setDepth(sc.chorus, t);
+      S.airLevel.gain.setTargetAtTime(sc.air ? MIX.air : 0, t, 2);
+      if (!sc.halo) swapNotes(S.halo, {}, t, null, 2.4);
+      wet.gain.setTargetAtTime(sc.wet, t, 1.5);
+    }
+    function resync(t) {                 // we were asleep: pick the rhythm up again cleanly
+      if (!S) return;
+      S.nextTime = t; S.anchor = true;
+      try { S.leadPan.pan.cancelScheduledValues(ac.currentTime); S.bedPan.pan.cancelScheduledValues(ac.currentTime); } catch (e) {}
+    }
+
+    function semisOf(deg) {              // scale degree to semitones; the leading tone where a major dominant sounds
+      var s = degreeToSemitones(S.m.scale, deg);
+      if (S.chord && S.chord.raised && mod(deg, 7) === 6) s += 1;
+      return s;
+    }
+    function harmonyDeg(deg, chord) {    // the second voice: a third below, or a sixth below when that fits the chord better
+      var a = deg - 2, b = deg - 5;
+      var fits = function (d) {
+        var rel = mod(d - chord.r, 7);
+        return rel === 0 || rel === 2 || rel === 4 || (rel === 6 && (chord.seventh || chord.raised));
+      };
+      return (b >= -4 && !fits(a) && fits(b)) ? b : a;
+    }
+    function playLead(t, deg, vel, stage, glide, side, full) {
+      var ens = S.m.ensemble, semis = semisOf(deg) + ens.shift;
+      if (!glide) { hopNote(t, semis, side, vel); return; }
+      if (ens.lead === 'piano') pianoNote(t, semis, vel, MIX.piano, S.leadIn);
+      else if (ens.lead === 'glass') glassNote(t, semis, vel, MIX.glass, S.leadIn, 1.5);
+      else bowedTo('lead', t, semis, vel, S.leadIn, MIX.bowed, 2400, 5.2);
+      if (!full) return;
+      if (stage.second) {
+        var h = semisOf(harmonyDeg(deg, S.chord)) + ens.shift;
+        if (ens.lead === 'piano') pianoNote(t, h, vel * 0.5, MIX.piano, S.fillIn);
+        else if (ens.lead === 'glass') glassNote(t, h, vel * 0.5, MIX.glass, S.fillIn, 1.3);
+        else bowedTo('second', t, h, vel, S.sectionIn, MIX.second, 1900, 5);
+      }
+      if (stage.octave) {
+        var o = semis + (ens.shift ? -12 : 12);
+        if (ens.lead === 'piano') pianoNote(t, o, vel * 0.35, MIX.piano, S.fillIn);
+        else if (ens.lead === 'glass') glassNote(t, o, vel * 0.4, MIX.glass, S.fillIn, 1.5);
+        else bowedTo('octave', t, o, vel, S.sectionIn, MIX.octave, 2800, 5.5);
+      }
+    }
+    function hopNote(t, semis, side, vel) {      // parked Hop movement: a pluck that lives wholly in one ear
+      var p = ac.createStereoPanner();
+      p.pan.value = side;
+      p.connect(S ? S.hopIn : tone);
+      glassNote(t, semis, vel, MIX.hop, p, clamp(settings.speedT * 0.3, 0.2, 0.55), p);
+    }
+
+    function step() {
+      var t = S.nextTime, T = settings.speedT, glide = settings.mode !== 'hop';
+      var side = (S.n % 2 === 0) ? -1 : 1, i;   // this step begins in the left (-1) or right (+1) ear
+
+      // The sweep to the opposite ear, eased along a half cosine and drawn as eight short ramps.
+      // The lead travels the whole way; the bed stops a little short of each ear.
+      if (glide) {
+        if (S.anchor) {
+          S.leadPan.pan.setValueAtTime(side, t);
+          S.bedPan.pan.setValueAtTime(side * BED_WIDTH, t);
+          S.anchor = false;
+        }
+        for (i = 1; i <= 8; i++) {
+          var c = side * Math.cos(Math.PI * i / 8), at = t + T * i / 8;
+          S.leadPan.pan.linearRampToValueAtTime(c, at);
+          S.bedPan.pan.linearRampToValueAtTime(c * BED_WIDTH, at);
+        }
+      } else if (!S.anchor) {                    // Hop: notes carry their own position; the bed rests in the middle
+        S.leadPan.pan.linearRampToValueAtTime(0, t + 0.3);
+        S.bedPan.pan.linearRampToValueAtTime(0, t + 0.3);
+        S.anchor = true;
+      }
+
+      var m = S.m, ens = m.ensemble, span = ens.span;
+      if (S.intro > 0) {                          // the bed alone, on the harmony that closes the theme, before the tune enters
+        var ipos = THEME_STEPS - S.intro, ichord = m.chords[Math.floor(ipos / span)];
+        if (ichord !== S.chord) setChord(t, ichord, (span - ipos % span) * T);
+        S.intro--;
+      } else {
+        var cyc = Math.floor(S.pos / THEME_STEPS), pos = S.pos % THEME_STEPS;
+        var stage = STAGES[cyc % STAGES.length];
+        if (cyc !== S.cycle) {
+          S.cycle = cyc;
+          S.steps = cycleSteps(m.theme, m.seed, cyc);
+          S.halves = decorate(S.steps, m.seed, cyc);
+          S.has7 = lowSevenths(S.steps, S.halves, span);
+          S.bedLevel.gain.setTargetAtTime(0.8 + 0.2 * stage.level, t, 2.5);
+        }
+        var slot = Math.floor(pos / span), chord = m.chords[slot];
+        if (m.raised[slot] && !S.has7[slot]) chord = m.raised[slot];   // the brighter, yearning dominant, where the tune allows it
+        if (chord !== S.chord) setChord(t, chord, (span - pos % span) * T);
+        var deg = S.steps[pos], half = S.halves[pos];
+        var resting = stage.rest && pos < 16;
+        var vel = (pos % PHRASE === 0 ? 1 : 0.84) * (0.9 + 0.1 * Math.sin(S.pos * 1.7)) * stage.level;
+
+        if (!resting) {
+          if (deg !== null) playLead(t, deg, vel, stage, glide, side, true);
+          else if (!glide && S.lastDeg !== null) playLead(t, S.lastDeg, vel * 0.42, stage, glide, side, false);
+          if (half !== null) playLead(t + T / 2, half, vel * 0.8, stage, glide, side, false);
+        }
+        if (deg !== null) S.lastDeg = deg;
+        // sustained voices breathe out at the end of a phrase, and fall silent when their turn is over
+        [['lead', !resting && glide], ['second', !resting && glide && stage.second], ['octave', !resting && glide && stage.octave]].forEach(function (e) {
+          var v = S[e[0]];
+          if (!v || !v.sounding) return;
+          if (!e[1]) v.rest(t, 0.9);
+          else if (pos % PHRASE === PHRASE - 1) v.ease(t, 0.4, T * 0.5);
+        });
+
+        if (ens.fill && S.pos >= 16) {            // accompaniment enters halfway through the first pass
+          var k = pos % span;
+          if (ens.fill === 'piano') {
+            pianoNote(t, fillTone(chord, k), (deg !== null && !resting ? 0.75 : 1) * stage.level, MIX.pianoFill, S.fillIn);
+          } else if (deg === null || resting) {
+            glassNote(t, fillTone(chord, k) + 12, stage.level, MIX.glassFill, S.fillIn, 1.2);
+          }
+        }
+        if (stage.counter && S.pos >= THEME_STEPS) {
+          if (pos % span === 0 || !S.counter || !S.counter.sounding) counterNote(t, chord);
+        } else if (S.counter && S.counter.sounding) {
+          S.counter.rest(t, 1.2);
+        }
+        S.pos++;
+      }
+
+      S.marks.push({ t: t, T: T, side: side, glide: glide });
+      if (S.marks.length > 48) S.marks.shift();
+      S.n++;
+      S.nextTime = t + T;
+    }
+
+    function retune() {
+      if (!S) return;
+      var now = ac.currentTime;
+      S.voices.forEach(function (v) {
+        var f = hz(v.semis);
+        v.oscs.forEach(function (o, i) { o.frequency.setTargetAtTime(f * v.mults[i], now, 0.2); });
+      });
+    }
+    function earTone(pan) {
+      var p = ac.createStereoPanner();
+      p.pan.value = pan; p.connect(tone);
+      glassNote(ac.currentTime + 0.06, 7, 1, 0.3, p, 0.4, p);
+    }
+
+    return {
+      ac: ac, master: master,
+      begin: begin, end: end, step: step, resync: resync, switchMelody: switchMelody,
+      retune: retune, earTone: earTone, level: level,
+      active: function () { return !!S; },
+      nextTime: function () { return S ? S.nextTime : Infinity; },
+      marks: function () { return S ? S.marks : []; },
+      began: function () { return S ? S.began : 0; },
+      solo: function (name) { if (S) Object.keys(S.layers).forEach(function (k) { S.layers[k].gain.value = (!name || k === name) ? 1 : 0; }); }
+    };
+  }
+
+  /* =====================================================================
+     PLAYBACK — the live context, the scheduler, and the phone's quirks
+     ===================================================================== */
+  var AC = window.AudioContext || window.webkitAudioContext;
+  var canPan = !!(AC && window.StereoPannerNode);
+  var isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) ||
+              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+  var ctx = null, E = null;
+  var state = 'idle';                  // idle | playing | paused
+  var melody = null;                   // current melody (may outlive the session so it can still be saved)
+  var schedTimer = null, pauseTimer = null, idleTimer = null, silentEl = null, wake = null;
+
+  // iPhone: sound should count as media playback, so the silent switch does not mute it
+  // and, where the phone allows, it keeps going behind the lock screen.
+  function claimPlayback() { try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {} }
+  function silentWavUri() {
+    var n = 4000, b = new Uint8Array(44 + n), v = new DataView(b.buffer);
+    var w = function (o, s) { for (var i = 0; i < s.length; i++) b[o + i] = s.charCodeAt(i); };
+    w(0, 'RIFF'); v.setUint32(4, 36 + n, true); w(8, 'WAVEfmt '); v.setUint32(16, 16, true);
+    v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, 8000, true); v.setUint32(28, 8000, true);
+    v.setUint16(32, 1, true); v.setUint16(34, 8, true); w(36, 'data'); v.setUint32(40, n, true);
+    for (var i = 44; i < b.length; i++) b[i] = 128;
+    var s = ''; for (var j = 0; j < b.length; j++) s += String.fromCharCode(b[j]);
+    return 'data:audio/wav;base64,' + btoa(s);
+  }
+  function unlockPlayback() {
+    claimPlayback();
+    if (!isIOS) return;
+    try {
+      if (!silentEl) {
+        silentEl = document.createElement('audio');
+        silentEl.setAttribute('playsinline', '');
+        silentEl.setAttribute('x-webkit-airplay', 'deny');
+        silentEl.loop = true;
+        silentEl.src = silentWavUri();
+        silentEl.addEventListener('timeupdate', tick);   // a second heartbeat for the scheduler when timers are slowed
+      }
+      var p = silentEl.play();
+      if (p && p.catch) p.catch(function () {});
+    } catch (e) {}
+  }
+  function quietPlayback() { try { if (silentEl) silentEl.pause(); } catch (e) {} }
+
+  // Must run inside the tap itself: iPhone only lets sound start from a gesture.
+  function prime() {
+    if (!canPan) { say('This browser cannot place sound left and right, so the test cannot run here.'); return false; }
+    unlockPlayback();
+    if (!ctx) {
+      try { ctx = new AC({ latencyHint: 'playback' }); } catch (e) { ctx = new AC(); }
+      E = createEngine(ctx);
+      ctx.onstatechange = watchContext;
+    }
+    clearTimeout(idleTimer);
+    if (ctx.state !== 'running') { var p = ctx.resume(); if (p && p.catch) p.catch(function () {}); }
+    return true;
+  }
+  function restSoon() {                // let the reverb ring out, then let the phone's audio sleep
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(function () {
+      if (state !== 'idle' || !ctx) return;
+      quietPlayback();
+      try { var p = ctx.suspend(); if (p && p.catch) p.catch(function () {}); } catch (e) {}
+    }, 6000);
+  }
+
+  function tick() {
+    if (!E || !E.active() || state !== 'playing' || ctx.state !== 'running') return;
+    var now = ctx.currentTime;
+    if (E.nextTime() < now - 0.05) E.resync(now + 0.1);
+    // Behind a lock screen timers fire rarely, so the music is written several seconds ahead.
+    var horizon = document.hidden ? 6 : 0.35;
+    while (E.nextTime() < now + horizon) E.step();
+  }
+  function startSession(m) {
+    melody = m;
+    E.begin(m, ctx.currentTime + 0.2);
+    state = 'playing';
+    clearInterval(schedTimer);
+    schedTimer = setInterval(tick, 60);
+  }
+  function stopSession(note) {
+    if (E) E.end();
+    clearInterval(schedTimer); schedTimer = null;
+    state = 'idle';
+    dropWake(); hideVeil(); restSoon();
+    say(note || '');
+    render();
+  }
+  function pauseSession() {            // from the lock-screen controls
+    if (state !== 'playing' || !ctx) return;
+    state = 'paused';
+    try { var p = ctx.suspend(); if (p && p.catch) p.catch(function () {}); } catch (e) {}
+    dropWake(); hideVeil();
+    say('Paused. Press Resume to carry on.');
+    render();
+  }
+  function resumeSession() {
+    if (state !== 'paused' || !prime()) return;
+    state = 'playing';
+    say('');
+    render(); screenCare(); tick(); watchContext();
+  }
+
+  function watchContext() {
+    clearTimeout(pauseTimer);
+    if (state !== 'playing' || !ctx || ctx.state === 'running') return;
+    pauseTimer = setTimeout(function () {
+      if (state === 'playing' && ctx.state !== 'running' && !document.hidden) {
+        state = 'paused';
+        dropWake(); hideVeil();
+        say('The sound was paused. Press Resume to carry on.');
+        render();
+      }
+    }, 1500);
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (state !== 'playing' || !ctx) return;
+    if (document.hidden) { tick(); return; }             // write ahead before the timers slow down
+    claimPlayback();
+    screenCare();
+    if (ctx.state !== 'running') { var p = ctx.resume(); if (p && p.catch) p.catch(function () {}); }
+    tick();
+    watchContext();
+  });
+
+  /* ---- screen: either the page goes dark and the phone stays awake, or the phone sleeps as usual ---- */
+  var veilTimer = null, VEIL_AFTER = 20000, wakePending = false;
+  function holdWake() {
+    try {
+      if (!('wakeLock' in navigator) || wake || wakePending) return;
+      wakePending = true;
+      navigator.wakeLock.request('screen').then(function (w) {
+        wakePending = false;
+        wake = w;
+        w.addEventListener('release', function () { if (wake === w) wake = null; });
+        if (state !== 'playing' || settings.screen !== 'dark') dropWake();
+      }).catch(function () { wakePending = false; });
+    } catch (e) {}
+  }
+  function dropWake() { try { if (wake) wake.release(); } catch (e) {} wake = null; }
+  function hideVeil() {
+    clearTimeout(veilTimer);
+    $('veil').classList.remove('on');
+  }
+  function screenCare() {              // call whenever the session, the setting or the viewer's attention changes
+    hideVeil();
+    if (state === 'playing' && settings.screen === 'dark') {
+      holdWake();
+      veilTimer = setTimeout(function () {
+        if (state === 'playing' && settings.screen === 'dark') $('veil').classList.add('on');
+      }, VEIL_AFTER);
+    } else {
+      dropWake();
+    }
+  }
+  ['pointerdown', 'keydown', 'input'].forEach(function (type) {
+    document.addEventListener(type, function (ev) {
+      // a touch on the dark page is handled by the page itself, so it cannot fall through to a button underneath
+      if (ev.target && ev.target.closest && ev.target.closest('#veil')) return;
+      if (state === 'playing') screenCare();
+    }, true);
+  });
+
+  /* ---- lock-screen and headphone controls ---- */
+  var nowKey = '';
+  function nowPlaying() {
+    try {
+      if (!('mediaSession' in navigator)) return;
+      var key = state + '|' + (melody ? melody.id : '');
+      if (key === nowKey) return;
+      nowKey = key;
+      navigator.mediaSession.playbackState = state === 'playing' ? 'playing' : state === 'paused' ? 'paused' : 'none';
+      if (melody && window.MediaMetadata) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: melody.name, artist: melody.ensemble.label, album: 'Bilateral Sound Test'
+        });
+      }
+    } catch (e) {}
+  }
+  try {
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.setActionHandler('play', resumeSession);
+      navigator.mediaSession.setActionHandler('pause', pauseSession);
+      navigator.mediaSession.setActionHandler('stop', function () { stopSession('Stopped.'); });
+    }
+  } catch (e) {}
+
+  /* =====================================================================
+     SAVED MELODIES — shown from this device at once; kept with the
+     viewer's account when the page is allowed to, so they follow across devices.
+     ===================================================================== */
+  var saved = [];                      // [{id, seed, name, mode, speedT, pitch, at, synced}]
+  var cloud = null, flushed = false;
+
+  function cleanItem(x) {
+    if (!x || typeof x.seed !== 'number') return null;
+    var seed = x.seed >>> 0;
+    return {
+      id: seedId(seed), seed: seed, name: nameFor(seed),
+      ens: ensembleById(x.ens) ? x.ens : pickEnsemble(seed, true).id,
+      mode: (HOP_ENABLED && x.mode === 'hop') ? 'hop' : 'glide',
+      speedT: clamp(typeof x.speedT === 'number' ? x.speedT : 1.5, FAST, SLOW),
+      pitch: clamp(Math.round(typeof x.pitch === 'number' ? x.pitch : 0), -5, 5),
+      at: typeof x.at === 'number' ? x.at : 0,
+      synced: !!x.synced
+    };
+  }
+  function loadSaved() {
+    try {
+      var raw = JSON.parse(localStorage.getItem(LS_SAVED) || '[]');
+      if (Array.isArray(raw)) saved = raw.map(cleanItem).filter(Boolean);
+    } catch (e) { saved = []; }
+  }
+  function storeSaved() { try { localStorage.setItem(LS_SAVED, JSON.stringify(saved)); } catch (e) {} }
+  function findSaved(id) { for (var i = 0; i < saved.length; i++) if (saved[i].id === id) return saved[i]; return null; }
+  function bodyOf(it) { return { kind: 'melody', seed: it.seed, ens: it.ens, mode: it.mode, speedT: it.speedT, pitch: it.pitch, at: it.at }; }
+
+  function pushToCloud(it) {
+    if (!cloud) return Promise.resolve();
+    return cloud.doc(it.id).set(bodyOf(it)).then(function () { it.synced = true; storeSaved(); }).catch(function () {});
+  }
+  function saveCurrent() {
+    if (!melody) return;
+    var it = findSaved(melody.id);
+    if (!it) { it = { id: melody.id, seed: melody.seed, name: melody.name }; saved.unshift(it); }
+    it.ens = melody.ensemble.id;
+    it.mode = settings.mode; it.speedT = settings.speedT; it.pitch = settings.pitch;
+    it.at = Date.now(); it.synced = false;
+    storeSaved(); renderSaved(); render();
+    say('Saved “' + melody.name + '”.');
+    pushToCloud(it);
+  }
+  function removeSaved(id) {
+    saved = saved.filter(function (x) { return x.id !== id; });
+    storeSaved(); renderSaved(); render();
+    if (cloud) cloud.doc(id).delete().catch(function () {});
+  }
+  function onCloudSnapshot(snap) {
+    var remote = {};
+    snap.docs.forEach(function (d) {
+      var x = d.data();
+      if (!x || x.kind !== 'melody') return;
+      var it = cleanItem(x);
+      if (it) { it.synced = true; remote[it.id] = it; }
+    });
+    var keep = [];
+    saved.forEach(function (it) {
+      if (remote[it.id]) {
+        if (!it.synced && it.at > remote[it.id].at) keep.push(it);   // a newer local edit still on its way up
+        else keep.push(remote[it.id]);
+        delete remote[it.id];
+      } else if (!it.synced || snap.metadata.fromCache) keep.push(it); // not uploaded yet, or the answer is not final
+    });
+    Object.keys(remote).forEach(function (id) { keep.push(remote[id]); });
+    saved = keep;
+    storeSaved(); renderSaved(); render();
+    if (!snap.metadata.fromCache) {
+      $('storeNote').textContent = 'Saved melodies are kept with your Claude account, so they follow you from laptop to phone.';
+      if (!flushed) { flushed = true; setTimeout(flushUnsynced, 0); }
+    }
+  }
+  function flushUnsynced() {           // once per visit: upload anything saved while offline
+    var queue = saved.filter(function (it) { return !it.synced; });
+    (function next() { var it = queue.shift(); if (it) pushToCloud(it).then(next); })();
+  }
+  function initCloud() {
+    if (!window.claude || typeof window.claude.use !== 'function') return;
+    Promise.all([window.claude.use('db'), window.claude.use('user')]).then(function (r) {
+      var db = r[0], user = r[1];
+      if (!db || !user) return;
+      return user.id().then(function (uid) {
+        if (!uid) return;
+        cloud = db.collection('data/users/' + uid);
+        cloud.onSnapshot(onCloudSnapshot, function () {
+          cloud = null;
+          $('storeNote').textContent = 'Saved melodies are kept on this device.';
+        });
+      });
+    }).catch(function () {});
+  }
+
+  /* =====================================================================
+     INTERFACE
+     ===================================================================== */
+  var sayTimer = null;
+  function say(msg) {
+    var el = $('status');
+    clearTimeout(sayTimer);
+    if (msg) { el.textContent = msg; el.classList.add('on'); sayTimer = setTimeout(function () { el.classList.remove('on'); }, 6000); }
+    else el.classList.remove('on');
+  }
+  function describe(m, pitch) { return keyName(pitch) + ' ' + SCALE_LABEL[m.scale] + ' · ' + m.ensemble.label; }
+
+  function render() {
+    var main = $('mainBtn'), save = $('saveBtn'), next = $('nextBtn');
+    $('mainLabel').textContent = state === 'playing' ? 'Stop' : state === 'paused' ? 'Resume' : 'Begin';
+    document.body.setAttribute('data-state', state);
+    next.disabled = state === 'idle';
+    if (melody) {
+      $('melodyName').textContent = melody.name;
+      $('melodyMeta').textContent = melody.ensemble.label;
+      $('clockWrap').hidden = false;
+      var it = findSaved(melody.id);
+      var same = it && it.mode === settings.mode && it.pitch === settings.pitch && Math.abs(it.speedT - settings.speedT) < 0.005;
+      save.disabled = !!same;
+      save.textContent = !it ? 'Save' : same ? 'Saved' : 'Update';
+    } else {
+      save.disabled = true;
+      save.textContent = 'Save';
+    }
+    $('dot').classList.toggle('live', state === 'playing');
+    $('modeHint').textContent = settings.mode === 'glide'
+      ? 'One continuous sound drifting from ear to ear.'
+      : 'Separate notes, each one wholly in one ear, then the other.';
+    $('screenHint').textContent = settings.screen === 'dark'
+      ? 'After 20 seconds without a touch the page fades to black. The phone stays awake so the music keeps playing; tap anywhere to bring the page back.'
+      : 'The phone dims and locks as usual. Opened at its own address, the music carries on behind the lock screen. Inside Claude it stops when the phone locks.';
+    $('speedOut').textContent = settings.speedT.toFixed(1) + ' s per pass';
+    $('pitchOut').textContent = 'Key of ' + keyName(settings.pitch);
+    $('volumeOut').textContent = settings.vol + '%';
+    nowPlaying();
+  }
+  function syncControls() {
+    $('movementControl').hidden = !HOP_ENABLED;
+    $('modeGlide').checked = settings.mode === 'glide';
+    $('modeHop').checked = settings.mode === 'hop';
+    $('screenDark').checked = settings.screen === 'dark';
+    $('screenSleep').checked = settings.screen === 'sleep';
+    $('speed').value = tToSlider(settings.speedT);
+    $('pitch').value = settings.pitch;
+    $('volume').value = settings.vol;
+  }
+
+  function renderSaved() {
+    var list = $('savedList');
+    list.textContent = '';
+    saved.slice().sort(function (a, b) { return b.at - a.at; }).forEach(function (it) {
+      var li = document.createElement('li');
+      var info = document.createElement('div'); info.className = 'info';
+      var name = document.createElement('p'); name.className = 'name'; name.textContent = it.name;
+      var meta = document.createElement('p'); meta.className = 'meta';
+      meta.textContent = describe(makeMelody(it.seed, it.ens), it.pitch) + ' · ' + it.speedT.toFixed(1) + ' s';
+      info.appendChild(name); info.appendChild(meta);
+      var acts = document.createElement('div'); acts.className = 'row-actions';
+      var play = document.createElement('button'); play.type = 'button'; play.className = 'btn small';
+      play.textContent = 'Play'; play.setAttribute('aria-label', 'Play ' + it.name);
+      play.addEventListener('click', function () { playSaved(it); });
+      var del = document.createElement('button'); del.type = 'button'; del.className = 'btn small';
+      del.textContent = 'Remove'; del.setAttribute('aria-label', 'Remove ' + it.name);
+      var armed = false;
+      del.addEventListener('click', function () {           // two taps, so a slip of the thumb costs nothing
+        if (armed) { removeSaved(it.id); return; }
+        armed = true; del.textContent = 'Really remove?';
+        setTimeout(function () { armed = false; del.textContent = 'Remove'; }, 3000);
+      });
+      acts.appendChild(play); acts.appendChild(del);
+      li.appendChild(info); li.appendChild(acts);
+      list.appendChild(li);
+    });
+    $('savedEmpty').hidden = saved.length > 0;
+  }
+
+  function begin(m, note) {
+    if (!prime()) return;
+    if (state !== 'idle' && E.active()) { melody = m; E.switchMelody(m); }
+    else startSession(m);
+    state = 'playing';
+    say(note);
+    render(); screenCare(); tick(); watchContext();
+  }
+  function playSaved(it) {
+    settings.mode = it.mode; settings.speedT = it.speedT; settings.pitch = it.pitch;
+    storeSettings(); syncControls();
+    if (E) E.retune();
+    if (window.__ui) window.__ui.closeDrawer();
+    begin(makeMelody(it.seed, it.ens), 'Playing your saved melody.');
+  }
+
+  $('mainBtn').addEventListener('click', function () {
+    if (state === 'playing') { stopSession('Stopped. You can still save this melody; Begin composes a new one.'); return; }
+    if (state === 'paused') { resumeSession(); return; }
+    begin(makeMelody(freshSeed()), 'New music, composed for this session.');
+  });
+  $('nextBtn').addEventListener('click', function () {
+    if (state === 'idle') return;
+    begin(makeMelody(freshSeed()), 'Here is another.');
+  });
+  $('saveBtn').addEventListener('click', saveCurrent);
+
+  function onMode() {
+    settings.mode = (HOP_ENABLED && $('modeHop').checked) ? 'hop' : 'glide';
+    storeSettings(); render();
+  }
+  $('modeGlide').addEventListener('change', onMode);
+  $('modeHop').addEventListener('change', onMode);
+  function onScreen() {
+    settings.screen = $('screenSleep').checked ? 'sleep' : 'dark';
+    storeSettings(); render(); screenCare();
+  }
+  $('screenDark').addEventListener('change', onScreen);
+  $('screenSleep').addEventListener('change', onScreen);
+  $('speed').addEventListener('input', function () {
+    settings.speedT = sliderToT(+this.value); storeSettings(); render();
+  });
+  $('pitch').addEventListener('input', function () {
+    settings.pitch = clamp(Math.round(+this.value), -5, 5); storeSettings();
+    if (E) E.retune();
+    render();
+  });
+  $('volume').addEventListener('input', function () {
+    settings.vol = clamp(Math.round(+this.value), 0, 100); storeSettings();
+    if (E) E.master.gain.setTargetAtTime(volGain(), ctx.currentTime, 0.03);
+    render();
+  });
+  function earTest(pan) {
+    if (!prime()) return;
+    E.earTone(pan);
+    say(pan < 0 ? 'That tone should be in your left ear only.' : 'That tone should be in your right ear only.');
+    if (state === 'idle') restSoon();
+  }
+  $('testL').addEventListener('click', function () { earTest(-1); });
+  $('testR').addEventListener('click', function () { earTest(1); });
+  $('veil').addEventListener('click', function () { screenCare(); });
+
+  /* ---- the moving dot and the clock ---- */
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var lastClock = '';
+  function currentPan() {
+    if (!E || !E.active() || state !== 'playing') return null;
+    var marks = E.marks();
+    var tn = ctx.currentTime - (ctx.outputLatency || ctx.baseLatency || 0);
+    while (marks.length > 1 && marks[1].t <= tn) marks.shift();
+    var m = marks[0];
+    if (!m || tn < m.t) return null;
+    var u = clamp((tn - m.t) / m.T, 0, 1);
+    return m.glide ? m.side * Math.cos(Math.PI * u) : m.side;
+  }
+  function frame() {
+    var pan = currentPan(), dot = $('dot');
+    var x = 0;
+    if (pan !== null && !reduceMotion) x = pan * Math.max(0, ($('track').clientWidth - dot.offsetWidth) / 2);
+    dot.style.transform = 'translateX(' + x.toFixed(1) + 'px)';
+    $('earL').classList.toggle('on', pan !== null && pan < -0.55);
+    $('earR').classList.toggle('on', pan !== null && pan > 0.55);
+    if (window.__ui) window.__ui.wispFrame(pan, E && state === 'playing' ? E.level() : 0);
+    if (E && E.active() && state !== 'idle') {
+      var sec = Math.floor((performance.now() - E.began()) / 1000);
+      var txt = Math.floor(sec / 60) + ':' + ('0' + (sec % 60)).slice(-2);
+      if (txt !== lastClock) { lastClock = txt; $('clock').textContent = txt; }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  /* ---- start ---- */
+  claimPlayback();
+  loadSettings(); loadSaved(); syncControls(); renderSaved(); render();
+  if (!canPan) {
+    $('mainBtn').disabled = true;
+    say('This browser cannot place sound left and right, so the test cannot run here.');
+  }
+  requestAnimationFrame(frame);
+  initCloud();
+
+  // For checking the engine from a test harness; the page itself never reads this.
+  window.__bst = {
+    makeTheme: makeTheme, cycleSteps: cycleSteps, decorate: decorate, makeMelody: makeMelody,
+    degreeToSemitones: degreeToSemitones, ENSEMBLES: ENSEMBLES, MIX: MIX,
+    get ctx() { return ctx; }, get engine() { return E; }, get state() { return state; }, get settings() { return settings; },
+    render: function (seed, seconds, solo, ensembleId) {
+      var OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+      var oc = new OAC(2, Math.floor(44100 * seconds), 44100), e = createEngine(oc), m = makeMelody(seed, ensembleId);
+      e.master.gain.value = 0.8;
+      e.begin(m, 0.1);
+      if (solo) e.solo(solo);
+      while (e.nextTime() < seconds) e.step();
+      var t0 = performance.now();
+      return oc.startRendering().then(function (buf) {
+        return { L: buf.getChannelData(0), R: buf.getChannelData(1), ms: performance.now() - t0, scene: m.scene,
+                 chords: m.chords.map(function (c, i) { return m.raised[i] ? c.name + '/V' : c.name; }) };
+      });
+    }
+  };
+})();
+</script>
+</body>
+</html>
